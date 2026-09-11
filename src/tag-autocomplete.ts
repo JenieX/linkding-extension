@@ -13,6 +13,17 @@ export class TagAutocomplete extends LitElement {
     selectedIndex: { type: Number, state: true },
   };
 
+  declare inputId: string;
+  declare inputName: string;
+  declare value: string;
+  declare tags: string[];
+  declare isFocus: boolean;
+  declare isOpen: boolean;
+  declare suggestions: string[];
+  declare selectedIndex: number;
+
+  private input: HTMLInputElement | null;
+
   constructor() {
     super();
     this.inputId = '';
@@ -101,7 +112,7 @@ export class TagAutocomplete extends LitElement {
 
   complete(suggestion) {
     const bounds = getCurrentWordBounds(this.input);
-    const inputValue = this.input.value;
+    const inputValue = this.input!.value;
     this.value =
       inputValue.substring(0, bounds.start) +
       suggestion +

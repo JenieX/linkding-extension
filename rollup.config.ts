@@ -1,58 +1,85 @@
+// import esbuild from 'rollup-plugin-esbuild';
 import resolve from '@rollup/plugin-node-resolve';
-import terser from '@rollup/plugin-terser';
+// import terser from '@rollup/plugin-terser';
+import type { RollupOptions } from 'rollup';
+import typescript from '@rollup/plugin-typescript';
 
-const production = !process.env.ROLLUP_WATCH;
+// const production = !process.env.ROLLUP_WATCH;
 
-export default [
-  // Main bundle (browser action, options page)
-  {
-    input: 'src/index.js',
-    output: {
-      sourcemap: true,
-      format: 'iife',
-      name: 'linkding',
-      file: 'build/bundle.js',
-    },
-    plugins: [
-      // If you have external dependencies installed from
-      // npm, you'll most likely need these plugins. In
-      // some cases you'll need additional configuration —
-      // consult the documentation for details:
-      // https://github.com/rollup/rollup-plugin-commonjs
-      resolve({
-        browser: true,
-      }),
-
-      // If we're building for production (npm run build
-      // instead of npm run dev), minify
-      production && terser(),
-    ],
-    watch: {
-      clearScreen: false,
-    },
+const backgroundConfig: RollupOptions = {
+  input: 'src/background.ts',
+  output: {
+    sourcemap: true,
+    format: 'esm',
+    file: 'build/background.js',
   },
-  // Background bundle
-  {
-    input: 'src/background.js',
-    output: {
-      sourcemap: true,
-      format: 'iife',
-      file: 'build/background.js',
-    },
-    plugins: [
-      // If you have external dependencies installed from
-      // npm, you'll most likely need these plugins. In
-      // some cases you'll need additional configuration —
-      // consult the documentation for details:
-      // https://github.com/rollup/rollup-plugin-commonjs
-      resolve({ browser: true }),
+  plugins: [
+    typescript({
+      tsconfig: 'tsconfig.json',
+      include: [
+        './src/background.ts',
+        './src/browser.ts',
+        './src/cache.ts',
+        './src/configuration.ts',
+        './src/linkding.ts',
+      ],
+    }),
 
-      // If we're building for production (npm run build
-      // instead of npm run dev), minify
-      production && terser(),
-    ],
-    watch: {
-      clearScreen: false,
-    },
+    // If you have external dependencies installed from
+    // npm, you'll most likely need these plugins. In
+    // some cases you'll need additional configuration —
+    // consult the documentation for details:
+    // https://github.com/rollup/rollup-plugin-commonjs
+    resolve({ browser: true }),
+
+    // production && terser(),
+  ],
+  watch: {
+    clearScreen: false,
   },
-];
+};
+
+const bundleConfig: RollupOptions = {
+  input: 'src/index.ts',
+  output: {
+    sourcemap: true,
+    format: 'iife',
+    name: 'linkding',
+    file: 'build/bundle.js',
+  },
+  plugins: [
+    typescript({
+      tsconfig: 'tsconfig.json',
+      include: [
+        './src/browser.ts',
+        './src/cache.ts',
+        './src/configuration.ts',
+        './src/icons.ts',
+        './src/linkding.ts',
+        './src/options.ts',
+        './src/popup-form.ts',
+        './src/popup-intro.ts',
+        './src/popup.ts',
+        './src/profile.ts',
+        './src/tag-autocomplete.ts',
+        './src/util.ts',
+      ],
+    }),
+
+    // If you have external dependencies installed from
+    // npm, you'll most likely need these plugins. In
+    // some cases you'll need additional configuration —
+    // consult the documentation for details:
+    // https://github.com/rollup/rollup-plugin-commonjs
+    resolve({
+      browser: true,
+    }),
+
+    // production && terser(),
+  ],
+  watch: {
+    clearScreen: false,
+  },
+};
+
+export default [backgroundConfig, bundleConfig];

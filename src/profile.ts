@@ -1,6 +1,7 @@
 import { getStorageItem, setStorageItem } from './browser';
 import { getConfiguration, isConfigurationComplete } from './configuration';
 import { LinkdingApi } from './linkding';
+import { Profile } from './types';
 
 const PROFILE_CACHE_KEY = 'ld_profile_cache';
 
@@ -27,10 +28,10 @@ export async function updateProfile() {
 
 export async function getProfile() {
   const json = await getStorageItem(PROFILE_CACHE_KEY);
-  return json ? JSON.parse(json) : null;
+  return json ? (JSON.parse(json as string) as Profile) : null;
 }
 
-export async function cacheProfile(profile) {
+export async function cacheProfile(profile: Profile) {
   const json = JSON.stringify(profile);
   await setStorageItem(PROFILE_CACHE_KEY, json);
 }

@@ -1,8 +1,9 @@
 import { LitElement, html } from 'lit';
 import './popup-form.js';
 import './popup-intro.js';
-import { getConfiguration, isConfigurationComplete } from './configuration.js';
+import { Configuration } from './types.js';
 import { LinkdingApi } from './linkding.js';
+import { getConfiguration, isConfigurationComplete } from './configuration.js';
 
 export class Popup extends LitElement {
   static properties = {
@@ -10,6 +11,10 @@ export class Popup extends LitElement {
     configuration: { type: Object, state: true },
     api: { type: Object, state: true },
   };
+
+  declare hasCompleteConfiguration: boolean;
+  declare configuration: Configuration | null;
+  declare api: LinkdingApi | null;
 
   constructor() {
     super();

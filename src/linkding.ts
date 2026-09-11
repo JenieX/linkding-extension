@@ -1,5 +1,15 @@
+import {
+  Bookmark,
+  Configuration,
+  Profile,
+  SaveBookmarkOptions,
+  ServerMetadata,
+} from './types';
+
 export class LinkdingApi {
-  constructor(configuration) {
+  private configuration: Configuration;
+
+  constructor(configuration: Configuration) {
     this.configuration = configuration;
   }
 
@@ -12,7 +22,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return response.json() as Promise<Bookmark>;
       }
       return Promise.reject(
         `Error retrieving bookmark: ${response.statusText}`,
@@ -20,7 +30,7 @@ export class LinkdingApi {
     });
   }
 
-  async saveBookmark(bookmark, options = {}) {
+  async saveBookmark(bookmark, options: SaveBookmarkOptions = {}) {
     const configuration = this.configuration;
     const query = ['disable_scraping'];
     if (options.disable_html_snapshot) {
@@ -113,7 +123,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return response.json() as Promise<ServerMetadata>;
       }
       return Promise.reject(
         `Error checking bookmark URL: ${response.statusText}`,
@@ -130,7 +140,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return response.json() as Promise<Profile>;
       }
       return Promise.reject(
         `Error retrieving user profile: ${response.statusText}`,

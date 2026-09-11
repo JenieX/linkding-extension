@@ -1,5 +1,6 @@
 {
   "$schema": "file:///D:/projects/json-schemas/prettierrc.json",
+
   "arrowParens": "always",
   "bracketSameLine": false,
   "bracketSpacing": true,
@@ -19,5 +20,14 @@
   "plugins": ["prettier-plugin-jsdoc", "prettier-plugin-pkg"],
   "jsdocCommentLineStrategy": "singleLine",
   "jsdocPreferCodeFences": false,
-  "jsdocSingleLineComment": true
+  "jsdocSingleLineComment": true,
+
+  "overrides": [
+    {
+      "files": ["manifest.json", "tsconfig.json"],
+      "options": {
+        "printWidth": 30
+      }
+    }
+  ]
 }

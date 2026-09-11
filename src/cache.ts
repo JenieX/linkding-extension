@@ -1,6 +1,7 @@
 import { getStorageItem, setStorageItem } from './browser';
 import { getConfiguration, isConfigurationComplete } from './configuration';
 import { LinkdingApi } from './linkding';
+import { ServerMetadata } from './types';
 
 const SERVER_METADATA_CACHE_KEY = 'ld_server_metadata_cache';
 
@@ -45,7 +46,7 @@ export async function loadServerMetadata(url, precacheRequest = false) {
 
 export async function getCachedServerMetadata() {
   const json = await getStorageItem(SERVER_METADATA_CACHE_KEY);
-  return json ? JSON.parse(json) : null;
+  return json ? (JSON.parse(json as string) as ServerMetadata) : null;
 }
 
 export async function cacheServerMetadata(tabMetadata) {

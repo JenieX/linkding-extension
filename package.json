@@ -1,6 +1,8 @@
 {
+  "$schema": "file:///D:/projects/json-schemas/package.json",
   "name": "linkding-extension",
   "version": "1.15.1",
+  "type": "module",
   "description": "Companion extension for the linkding bookmark service",
   "repository": {
     "type": "git",
@@ -23,9 +25,15 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/chrome": "^0.2.9",
+    "@types/node": "^22.20.2",
     "prettier": "^3.6.2",
     "prettier-plugin-jsdoc": "^1.8.1",
     "prettier-plugin-pkg": "^0.22.1",
-    "rollup": "^4.49.0"
+    "rollup": "^4.49.0",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "tslib": "^2.8.1",
+    "typescript": "^6.0.0"
   }
 }

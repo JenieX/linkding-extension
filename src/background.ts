@@ -1,17 +1,16 @@
-import {
-  getBrowser,
-  getCurrentTabInfo,
-  showBadge,
-  removeBadge,
-  showSuccessBadge,
-} from './browser';
 import { loadServerMetadata } from './cache';
 import { getConfiguration, isConfigurationComplete } from './configuration';
+import {
+  getCurrentTabInfo,
+  removeBadge,
+  showBadge,
+  showSuccessBadge,
+} from './browser';
 import { LinkdingApi } from './linkding';
+import { Configuration } from './types';
 
-const browser = getBrowser();
-let api = null;
-let configuration = null;
+let api: LinkdingApi;
+let configuration: Configuration;
 let hasCompleteConfiguration = false;
 
 async function initApi() {
@@ -22,13 +21,13 @@ async function initApi() {
   configuration = await getConfiguration();
   hasCompleteConfiguration = isConfigurationComplete(configuration);
 
+  console.log(configuration);
+
   if (hasCompleteConfiguration) {
     api = new LinkdingApi(configuration);
-  } else {
-    api = null;
   }
 
-  return api !== null;
+  return api !== undefined;
 }
 
 /* Dynamic badge */
@@ -43,16 +42,16 @@ async function setDynamicBadge(tabId, tabMetadata) {
 
 /* Omnibox / Search integration */
 
-browser.omnibox.onInputStarted.addListener(async () => {
+chrome.omnibox.onInputStarted.addListener(async () => {
   const isReady = await initApi();
   const description = isReady
     ? 'Search bookmarks in linkding'
     : '⚠️ Please configure the linkding extension first';
 
-  browser.omnibox.setDefaultSuggestion({ description });
+  chrome.omnibox.setDefaultSuggestion({ description });
 });
 
-browser.omnibox.onInputChanged.addListener((text, suggest) => {
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   if (!api) {
     return;
   }
@@ -71,7 +70,7 @@ browser.omnibox.onInputChanged.addListener((text, suggest) => {
     });
 });
 
-browser.omnibox.onInputEntered.addListener(async (content, disposition) => {
+chrome.omnibox.onInputEntered.addListener(async (content, disposition) => {
   if (!hasCompleteConfiguration || !content) {
     return;
   }
@@ -93,26 +92,26 @@ browser.omnibox.onInputEntered.addListener(async (content, disposition) => {
 
   switch (disposition) {
     case 'currentTab':
-      browser.tabs.update({ url });
+      chrome.tabs.update({ url });
       break;
     case 'newForegroundTab':
-      browser.tabs.create({ url });
+      chrome.tabs.create({ url });
       break;
     case 'newBackgroundTab':
-      browser.tabs.create({ url, active: false });
+      chrome.tabs.create({ url, active: false });
       break;
   }
 });
 
 /* Precache bookmark / website metadata when tab or URL changes */
 
-browser.tabs.onActivated.addListener(async (activeInfo) => {
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tabInfo = await getCurrentTabInfo();
   let tabMetadata = await loadServerMetadata(tabInfo.url, true);
   setDynamicBadge(activeInfo.tabId, tabMetadata);
 });
 
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   // Only interested in URL changes
   // Ignore URL changes in non-active tabs
   if (!changeInfo.url || !tab.active) {
@@ -125,21 +124,21 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 /* Context Menu */
 
-browser.runtime.onInstalled.addListener(() => {
-  browser.contextMenus.create({
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
     id: 'save-to-linkding',
     title: 'Save to linkding',
     contexts: ['link'],
   });
 });
 
-browser.contextMenus.onClicked.addListener(async (info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info) => {
   if (info.menuItemId === 'save-to-linkding') {
-    await saveToLinkding(info.linkUrl, tab);
+    await saveToLinkding(info.linkUrl);
   }
 });
 
-async function saveToLinkding(url) {
+async function saveToLinkding(url?: string) {
   const isReady = await initApi();
   if (!isReady) {
     return;
@@ -147,8 +146,8 @@ async function saveToLinkding(url) {
 
   try {
     const serverMetadata = await loadServerMetadata(url, false);
-    const title = serverMetadata.metadata.title ?? '';
-    const description = serverMetadata.metadata.description ?? '';
+    const title = serverMetadata!.metadata.title ?? '';
+    const description = serverMetadata!.metadata.description ?? '';
     const tagNames = configuration.default_tags
       ? configuration.default_tags
           .split(' ')

@@ -1,0 +1,21 @@
+{
+  "$schema": "file:///D:/projects/json-schemas/tsconfig.json",
+
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "moduleResolution": "bundler",
+    "noUncheckedIndexedAccess": true,
+    "checkJs": true,
+    "noEmit": true,
+    "types": ["chrome"]
+  },
+  "include": [
+    "rollup.config.js",
+    "src"
+  ]
+}

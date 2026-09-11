@@ -1,18 +1,20 @@
 import { LitElement, html, nothing } from 'lit';
-import './tag-autocomplete.js';
+import './tag-autocomplete';
+import { LinkdingApi } from './linkding';
 import {
+  createTab,
   getBrowserMetadata,
   getCurrentTabInfo,
   openOptions,
-  showBadge,
-  runSinglefile,
   removeBadge,
-  createTab,
+  runSinglefile,
+  showBadge,
 } from './browser.js';
-import { loadServerMetadata, clearCachedServerMetadata } from './cache.js';
-import { getProfile, updateProfile } from './profile.js';
 import { getConfiguration } from './configuration.js';
+import { getProfile, updateProfile } from './profile.js';
 import { icons } from './icons';
+import { loadServerMetadata, clearCachedServerMetadata } from './cache.js';
+import { Bookmark, Configuration, Profile, TabInfo } from './types';
 
 export class PopupForm extends LitElement {
   static properties = {
@@ -39,6 +41,29 @@ export class PopupForm extends LitElement {
     loading: { type: Boolean, state: true },
     deleteConfirmVisible: { type: Boolean, state: true },
   };
+
+  declare api: LinkdingApi | null;
+  declare configuration: Configuration | null;
+  declare url: string;
+  declare title: string;
+  declare titlePlaceholder: string;
+  declare descriptionPlaceholder: string;
+  declare description: string;
+  declare notes: string;
+  declare tags: string;
+  declare autoTags: string;
+  declare unread: boolean;
+  declare shared: boolean;
+  declare saveState: '' | 'loading' | 'success' | 'error';
+  declare errorMessage: string;
+  declare availableTagNames: string[];
+  declare existingBookmark: Bookmark | null;
+  declare editNotes: boolean;
+  declare profile: Profile | null;
+  declare tabInfo: TabInfo | null;
+  declare extensionConfiguration: Configuration | null;
+  declare loading: boolean;
+  declare deleteConfirmVisible: boolean;
 
   constructor() {
     super();
@@ -96,9 +121,8 @@ export class PopupForm extends LitElement {
     });
 
     // Load available tags in the background
-    this.tags = this.configuration.default_tags;
-    this.api
-      .getTags()
+    this.tags = this.configuration!.default_tags!;
+    this.api!.getTags()
       .catch(() => [])
       .then((tags) => {
         this.availableTagNames = tags.map((tag) => tag.name);
@@ -117,21 +141,21 @@ export class PopupForm extends LitElement {
 
     const [serverMetadata, browserMetadata] = await Promise.all([
       loadServerMetadata(this.url),
-      getBrowserMetadata(this.url),
+      getBrowserMetadata(),
     ]);
 
     this.loading = false;
 
-    if (this.configuration.useBrowserMetadata) {
+    if (this.configuration!.useBrowserMetadata) {
       this.title = browserMetadata.title;
       this.description = browserMetadata.description;
     } else {
-      this.title = serverMetadata.metadata.title;
-      this.description = serverMetadata.metadata.description;
+      this.title = serverMetadata!.metadata.title;
+      this.description = serverMetadata!.metadata.description;
     }
 
-    this.shared = this.configuration.shareSelected;
-    this.unread = this.configuration.unreadSelected;
+    this.shared = this.configuration!.shareSelected!;
+    this.unread = this.configuration!.unreadSelected!;
 
     // If the bookmark already exists, prefill the form with the existing bookmark
     if (!serverMetadata) {
@@ -179,7 +203,7 @@ export class PopupForm extends LitElement {
     try {
       this.saveState = 'loading';
 
-      await this.api.saveBookmark(bookmark, {
+      await this.api!.saveBookmark(bookmark, {
         disable_html_snapshot: this.extensionConfiguration?.runSinglefile,
       });
       await clearCachedServerMetadata();
@@ -190,13 +214,13 @@ export class PopupForm extends LitElement {
       // but only if precaching is enabled, since the badge will never
       // show when browsing without precaching
       if (this.extensionConfiguration?.precacheEnabled) {
-        showBadge(this.tabInfo.id);
+        showBadge(this.tabInfo!.id);
       }
 
       // Close popup window after saving the bookmark, if configured
       if (
         this.extensionConfiguration?.closeAddBookmarkWindowOnSave === true &&
-        this.extensionConfiguration?.closeAddBookmarkWindowOnSaveMs >= 0
+        this.extensionConfiguration?.closeAddBookmarkWindowOnSaveMs! >= 0
       ) {
         window.setTimeout(() => {
           window.close();
@@ -210,9 +234,9 @@ export class PopupForm extends LitElement {
       ) {
         runSinglefile();
       }
-    } catch (e) {
+    } catch (error) {
       this.saveState = 'error';
-      this.errorMessage = e.toString();
+      this.errorMessage = (error as Error).message;
       console.error(this.errorMessage);
     }
   }
@@ -231,13 +255,13 @@ export class PopupForm extends LitElement {
     }
 
     try {
-      await this.api.deleteBookmark(this.existingBookmark.id);
+      await this.api!.deleteBookmark(this.existingBookmark.id);
       await clearCachedServerMetadata();
-      removeBadge(this.tabInfo.id);
+      removeBadge(this.tabInfo!.id);
       window.close();
-    } catch (e) {
+    } catch (error) {
       this.saveState = 'error';
-      this.errorMessage = e.toString();
+      this.errorMessage = (error as Error).message;
       console.error(this.errorMessage);
     }
   }
@@ -249,7 +273,7 @@ export class PopupForm extends LitElement {
 
   handleOpenLinkding(e) {
     e.preventDefault();
-    createTab(this.configuration.baseUrl);
+    createTab(this.configuration!.baseUrl);
     window.close();
   }
 
@@ -342,9 +366,9 @@ export class PopupForm extends LitElement {
                       type="button"
                       class="btn btn-link"
                       @click="${(e) => {
-                      e.preventDefault();
-                      this.toggleNotes();
-                    }}"
+                        e.preventDefault();
+                        this.toggleNotes();
+                      }}"
                     >
                       Edit notes
                     </button>
@@ -368,9 +392,9 @@ export class PopupForm extends LitElement {
                       type="button"
                       class="btn btn-link"
                       @click="${(e) => {
-                      e.preventDefault();
-                      this.toggleNotes();
-                    }}"
+                        e.preventDefault();
+                        this.toggleNotes();
+                      }}"
                     >
                       Edit description
                     </button>
@@ -437,19 +461,19 @@ export class PopupForm extends LitElement {
               ? html`
                   <div class="button-row">
                     ${
-                    this.existingBookmark
-                      ? html`
-                          <button
-                            type="button"
-                            class="btn btn-error"
-                            aria-label="Delete bookmark"
-                            @click="${this.showDeleteConfirmation}"
-                          >
-                            ${icons.delete()}
-                          </button>
-                        `
-                      : nothing
-                  }
+                      this.existingBookmark
+                        ? html`
+                            <button
+                              type="button"
+                              class="btn btn-error"
+                              aria-label="Delete bookmark"
+                              @click="${this.showDeleteConfirmation}"
+                            >
+                              ${icons.delete()}
+                            </button>
+                          `
+                        : nothing
+                    }
                     <button
                       type="submit"
                       class="btn btn-primary btn-wide ml-auto ${this.saveState}"

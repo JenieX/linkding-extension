@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
-import { getConfiguration, saveConfiguration } from './configuration.js';
 import { LinkdingApi } from './linkding.js';
+import { getConfiguration, saveConfiguration } from './configuration.js';
 import { icons } from './icons';
 
 export class Options extends LitElement {
@@ -18,6 +18,19 @@ export class Options extends LitElement {
     isSuccess: { type: Boolean, state: true },
     isError: { type: Boolean, state: true },
   };
+
+  declare baseUrl: string;
+  declare token: string;
+  declare default_tags: string;
+  declare unreadSelected: boolean;
+  declare shareSelected: boolean;
+  declare useBrowserMetadata: boolean;
+  declare runSinglefile: boolean;
+  declare precacheEnabled: boolean;
+  declare closeAddBookmarkWindowOnSave: boolean;
+  declare closeAddBookmarkWindowOnSaveMs: number;
+  declare isSuccess: boolean;
+  declare isError: boolean;
 
   constructor() {
     super();
@@ -50,14 +63,15 @@ export class Options extends LitElement {
     const config = await getConfiguration();
     this.baseUrl = config.baseUrl;
     this.token = config.token;
-    this.default_tags = config.default_tags;
-    this.unreadSelected = config.unreadSelected;
-    this.shareSelected = config.shareSelected;
-    this.useBrowserMetadata = config.useBrowserMetadata;
-    this.runSinglefile = config.runSinglefile;
-    this.precacheEnabled = config.precacheEnabled;
-    this.closeAddBookmarkWindowOnSave = config.closeAddBookmarkWindowOnSave;
-    this.closeAddBookmarkWindowOnSaveMs = config.closeAddBookmarkWindowOnSaveMs;
+    this.default_tags = config.default_tags!;
+    this.unreadSelected = config.unreadSelected!;
+    this.shareSelected = config.shareSelected!;
+    this.useBrowserMetadata = config.useBrowserMetadata!;
+    this.runSinglefile = config.runSinglefile!;
+    this.precacheEnabled = config.precacheEnabled!;
+    this.closeAddBookmarkWindowOnSave = config.closeAddBookmarkWindowOnSave!;
+    this.closeAddBookmarkWindowOnSaveMs =
+      config.closeAddBookmarkWindowOnSaveMs!;
   }
 
   async handleSubmit(e) {
@@ -75,7 +89,7 @@ export class Options extends LitElement {
       closeAddBookmarkWindowOnSaveMs: this.closeAddBookmarkWindowOnSaveMs,
     };
 
-    const testResult = await new LinkdingApi(config).testConnection(config);
+    const testResult = await new LinkdingApi(config).testConnection();
 
     if (testResult) {
       await saveConfiguration(config);
@@ -300,10 +314,10 @@ export class Options extends LitElement {
                     id="input-close-window-on-save-time"
                     .value="${this.closeAddBookmarkWindowOnSaveMs}"
                     @input="${(e) =>
-                    this.handleInputChange(
-                      e,
-                      'closeAddBookmarkWindowOnSaveMs',
-                    )}"
+                      this.handleInputChange(
+                        e,
+                        'closeAddBookmarkWindowOnSaveMs',
+                      )}"
                   />
                   <div class="form-input-hint">
                     The time in milliseconds to wait before closing the bookmark

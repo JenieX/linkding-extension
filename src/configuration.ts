@@ -1,7 +1,8 @@
 import { getStorageItem, setStorageItem } from './browser';
+import { Configuration } from './types';
 
 const CONFIG_KEY = 'ld_ext_config';
-const DEFAULTS = {
+const DEFAULTS: Configuration = {
   baseUrl: '',
   token: '',
   default_tags: '',
@@ -12,9 +13,12 @@ const DEFAULTS = {
   closeAddBookmarkWindowOnSaveMs: 500,
 };
 
-export async function getConfiguration() {
+export async function getConfiguration(): Promise<Configuration> {
   const configJson = await getStorageItem(CONFIG_KEY);
-  const config = configJson ? JSON.parse(configJson) : {};
+  const config = configJson
+    ? (JSON.parse(configJson as string) as Configuration)
+    : {};
+
   return {
     ...DEFAULTS,
     ...config,
