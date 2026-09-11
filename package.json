@@ -19,11 +19,13 @@
   },
   "dependencies": {
     "lit": "^3.3.1"
-  },
+  },    
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "prettier": "^3.6.2",
+    "prettier-plugin-jsdoc": "^1.8.1",
+    "prettier-plugin-pkg": "^0.22.1",
     "rollup": "^4.49.0"
   }
 }
