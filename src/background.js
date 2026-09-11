@@ -4,10 +4,10 @@ import {
   showBadge,
   removeBadge,
   showSuccessBadge,
-} from "./browser";
-import { loadServerMetadata } from "./cache";
-import { getConfiguration, isConfigurationComplete } from "./configuration";
-import { LinkdingApi } from "./linkding";
+} from './browser';
+import { loadServerMetadata } from './cache';
+import { getConfiguration, isConfigurationComplete } from './configuration';
+import { LinkdingApi } from './linkding';
 
 const browser = getBrowser();
 let api = null;
@@ -46,8 +46,8 @@ async function setDynamicBadge(tabId, tabMetadata) {
 browser.omnibox.onInputStarted.addListener(async () => {
   const isReady = await initApi();
   const description = isReady
-    ? "Search bookmarks in linkding"
-    : "⚠️ Please configure the linkding extension first";
+    ? 'Search bookmarks in linkding'
+    : '⚠️ Please configure the linkding extension first';
 
   browser.omnibox.setDefaultSuggestion({ description });
 });
@@ -84,21 +84,21 @@ browser.omnibox.onInputEntered.addListener(async (content, disposition) => {
   // Edge doesn't allow updating the New Tab Page (tested with version 117).
   // Trying to do so will throw: "Error: Cannot update NTP tab."
   // As a workaround, open a new tab instead.
-  if (disposition === "currentTab") {
+  if (disposition === 'currentTab') {
     const tabInfo = await getCurrentTabInfo();
-    if (tabInfo.url === "edge://newtab/") {
-      disposition = "newForegroundTab";
+    if (tabInfo.url === 'edge://newtab/') {
+      disposition = 'newForegroundTab';
     }
   }
 
   switch (disposition) {
-    case "currentTab":
+    case 'currentTab':
       browser.tabs.update({ url });
       break;
-    case "newForegroundTab":
+    case 'newForegroundTab':
       browser.tabs.create({ url });
       break;
-    case "newBackgroundTab":
+    case 'newBackgroundTab':
       browser.tabs.create({ url, active: false });
       break;
   }
@@ -127,14 +127,14 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 browser.runtime.onInstalled.addListener(() => {
   browser.contextMenus.create({
-    id: "save-to-linkding",
-    title: "Save to linkding",
-    contexts: ["link"],
+    id: 'save-to-linkding',
+    title: 'Save to linkding',
+    contexts: ['link'],
   });
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "save-to-linkding") {
+  if (info.menuItemId === 'save-to-linkding') {
     await saveToLinkding(info.linkUrl, tab);
   }
 });
@@ -147,11 +147,11 @@ async function saveToLinkding(url) {
 
   try {
     const serverMetadata = await loadServerMetadata(url, false);
-    const title = serverMetadata.metadata.title ?? "";
-    const description = serverMetadata.metadata.description ?? "";
+    const title = serverMetadata.metadata.title ?? '';
+    const description = serverMetadata.metadata.description ?? '';
     const tagNames = configuration.default_tags
       ? configuration.default_tags
-          .split(" ")
+          .split(' ')
           .map((tag) => tag.trim())
           .filter((tag) => !!tag)
       : [];
@@ -177,6 +177,6 @@ async function saveToLinkding(url) {
       setDynamicBadge(currentTab.id, tabMetadata);
     }, 1000);
   } catch (error) {
-    console.error("Error saving link to linkding:", error);
+    console.error('Error saving link to linkding:', error);
   }
 }

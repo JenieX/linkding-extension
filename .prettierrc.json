@@ -1,0 +1,23 @@
+{
+  "$schema": "file:///D:/projects/json-schemas/prettierrc.json",
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "embeddedLanguageFormatting": "auto",
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "semi": true,
+  "singleAttributePerLine": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "useTabs": false,
+
+  "plugins": ["prettier-plugin-jsdoc", "prettier-plugin-pkg"],
+  "jsdocCommentLineStrategy": "singleLine",
+  "jsdocPreferCodeFences": false,
+  "jsdocSingleLineComment": true
+}

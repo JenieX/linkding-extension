@@ -1,5 +1,5 @@
 export function getBrowser() {
-  return typeof browser !== "undefined" ? browser : chrome;
+  return typeof browser !== 'undefined' ? browser : chrome;
 }
 
 export async function getCurrentTabInfo() {
@@ -10,26 +10,26 @@ export async function getCurrentTabInfo() {
   const tab = tabs && tabs[0];
 
   return {
-    id: tab ? tab.id : "",
-    url: tab ? tab.url : "",
-    title: tab ? tab.title : "",
+    id: tab ? tab.id : '',
+    url: tab ? tab.url : '',
+    title: tab ? tab.title : '',
   };
 }
 
 function isFirefox() {
   const runtime = getBrowser().runtime;
-  if (runtime && typeof runtime.getURL === "function") {
-    const extensionUrl = runtime.getURL("");
-    return extensionUrl.startsWith("moz-extension://");
+  if (runtime && typeof runtime.getURL === 'function') {
+    const extensionUrl = runtime.getURL('');
+    return extensionUrl.startsWith('moz-extension://');
   }
 
   return (
-    typeof navigator !== "undefined" && navigator.userAgent.includes("Firefox/")
+    typeof navigator !== 'undefined' && navigator.userAgent.includes('Firefox/')
   );
 }
 
 function useChromeScripting() {
-  return typeof chrome !== "undefined" && !!chrome.scripting;
+  return typeof chrome !== 'undefined' && !!chrome.scripting;
 }
 
 export async function getBrowserMetadata() {
@@ -40,26 +40,26 @@ export async function getBrowserMetadata() {
   const tab = tabs && tabs[0];
 
   const errorHandler = (error) => {
-    console.error("Failed to load browser metadata", error);
-    return { title: "", description: "" };
+    console.error('Failed to load browser metadata', error);
+    return { title: '', description: '' };
   };
 
   if (useChromeScripting()) {
     function getMetadata() {
       const title =
-        document.querySelector("title")?.textContent ||
+        document.querySelector('title')?.textContent ||
         document
           .querySelector('meta[property="og:title"]')
-          ?.getAttribute("content") ||
-        "";
+          ?.getAttribute('content') ||
+        '';
       const description =
         document
           .querySelector('meta[name="description"]')
-          ?.getAttribute("content") ||
+          ?.getAttribute('content') ||
         document
           .querySelector('meta[property="og:description"]')
-          ?.getAttribute("content") ||
-        "";
+          ?.getAttribute('content') ||
+        '';
       return { title, description };
     }
 
@@ -100,17 +100,17 @@ export async function getBrowserMetadata() {
 
 export function getStorage() {
   if (
-    typeof browser !== "undefined" &&
-    typeof browser.storage !== "undefined"
+    typeof browser !== 'undefined' &&
+    typeof browser.storage !== 'undefined'
   ) {
     return browser.storage.local;
   } else if (
-    typeof chrome !== "undefined" &&
-    typeof chrome.storage !== "undefined"
+    typeof chrome !== 'undefined' &&
+    typeof chrome.storage !== 'undefined'
   ) {
     return chrome.storage.local;
   } else {
-    throw new Error("Storage API not found.");
+    throw new Error('Storage API not found.');
   }
 }
 
@@ -145,10 +145,10 @@ export function openOptions() {
 export function showBadge(tabId) {
   const browser = getBrowser();
   const action = browser.browserAction || browser.action;
-  action.setBadgeText({ text: "★", tabId: tabId });
-  action.setBadgeTextColor({ color: "#FFE234", tabId: tabId });
+  action.setBadgeText({ text: '★', tabId: tabId });
+  action.setBadgeTextColor({ color: '#FFE234', tabId: tabId });
   action.setBadgeBackgroundColor({
-    color: "rgba(100,100,100,1)",
+    color: 'rgba(100,100,100,1)',
     tabId: tabId,
   });
 }
@@ -156,16 +156,16 @@ export function showBadge(tabId) {
 export function removeBadge(tabId) {
   const browser = getBrowser();
   const action = browser.browserAction || browser.action;
-  action.setBadgeText({ text: "", tabId: tabId });
+  action.setBadgeText({ text: '', tabId: tabId });
 }
 
 export function showSuccessBadge(tabId) {
   const browser = getBrowser();
   const action = browser.browserAction || browser.action;
-  action.setBadgeText({ text: "✔", tabId: tabId });
-  action.setBadgeTextColor({ color: "#FFFFFF", tabId: tabId });
+  action.setBadgeText({ text: '✔', tabId: tabId });
+  action.setBadgeTextColor({ color: '#FFFFFF', tabId: tabId });
   action.setBadgeBackgroundColor({
-    color: "rgba(76,175,80,1)",
+    color: 'rgba(76,175,80,1)',
     tabId: tabId,
   });
 }
@@ -173,9 +173,9 @@ export function showSuccessBadge(tabId) {
 export function runSinglefile() {
   const browser = getBrowser();
   const extensionId = isFirefox()
-    ? "{531906d3-e22f-4a6c-a102-8057b88a1a63}"
-    : "mpiodijhokgodhhofbcjdecpffjipkle";
-  browser.runtime.sendMessage(extensionId, "save-page");
+    ? '{531906d3-e22f-4a6c-a102-8057b88a1a63}'
+    : 'mpiodijhokgodhhofbcjdecpffjipkle';
+  browser.runtime.sendMessage(extensionId, 'save-page');
 }
 
 export function createTab(url) {

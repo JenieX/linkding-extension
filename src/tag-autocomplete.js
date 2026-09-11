@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import { getCurrentWord, getCurrentWordBounds } from "./util.js";
+import { LitElement, html } from 'lit';
+import { getCurrentWord, getCurrentWordBounds } from './util.js';
 
 export class TagAutocomplete extends LitElement {
   static properties = {
@@ -15,9 +15,9 @@ export class TagAutocomplete extends LitElement {
 
   constructor() {
     super();
-    this.inputId = "";
-    this.inputName = "";
-    this.value = "";
+    this.inputId = '';
+    this.inputName = '';
+    this.value = '';
     this.tags = [];
     this.isFocus = false;
     this.isOpen = false;
@@ -31,7 +31,7 @@ export class TagAutocomplete extends LitElement {
   }
 
   firstUpdated(_props) {
-    this.input = this.querySelector("input");
+    this.input = this.querySelector('input');
   }
 
   handleFocus() {
@@ -64,7 +64,7 @@ export class TagAutocomplete extends LitElement {
 
   fireValueChange() {
     this.dispatchEvent(
-      new CustomEvent("value-change", { detail: { value: this.value } }),
+      new CustomEvent('value-change', { detail: { value: this.value } }),
     );
   }
 
@@ -105,7 +105,7 @@ export class TagAutocomplete extends LitElement {
     this.value =
       inputValue.substring(0, bounds.start) +
       suggestion +
-      " " +
+      ' ' +
       inputValue.substring(bounds.end);
     this.fireValueChange();
 
@@ -126,9 +126,9 @@ export class TagAutocomplete extends LitElement {
     return html`
       <div class="form-autocomplete">
         <div
-          class="form-autocomplete-input form-input ${this.isFocus
-            ? "is-focused"
-            : ""}"
+          class="form-autocomplete-input form-input ${
+            this.isFocus ? 'is-focused' : ''
+          }"
         >
           <input
             id="${this.inputId}"
@@ -147,14 +147,14 @@ export class TagAutocomplete extends LitElement {
         </div>
 
         <ul
-          class="menu ${this.isOpen && this.suggestions.length > 0
-            ? "open"
-            : ""}"
+          class="menu ${
+            this.isOpen && this.suggestions.length > 0 ? 'open' : ''
+          }"
         >
           ${this.suggestions.map(
             (tag, i) => html`
               <li
-                class="menu-item ${this.selectedIndex === i ? "selected" : ""}"
+                class="menu-item ${this.selectedIndex === i ? 'selected' : ''}"
               >
                 <a
                   href="#"
@@ -176,4 +176,4 @@ export class TagAutocomplete extends LitElement {
   }
 }
 
-customElements.define("ld-tag-autocomplete", TagAutocomplete);
+customElements.define('ld-tag-autocomplete', TagAutocomplete);

@@ -1,10 +1,10 @@
-import { getStorageItem, setStorageItem } from "./browser";
+import { getStorageItem, setStorageItem } from './browser';
 
-const CONFIG_KEY = "ld_ext_config";
+const CONFIG_KEY = 'ld_ext_config';
 const DEFAULTS = {
-  baseUrl: "",
-  token: "",
-  default_tags: "",
+  baseUrl: '',
+  token: '',
+  default_tags: '',
   useBrowserMetadata: false,
   runSinglefile: false,
   precacheEnabled: false,

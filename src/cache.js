@@ -1,8 +1,8 @@
-import { getStorageItem, setStorageItem } from "./browser";
-import { getConfiguration, isConfigurationComplete } from "./configuration";
-import { LinkdingApi } from "./linkding";
+import { getStorageItem, setStorageItem } from './browser';
+import { getConfiguration, isConfigurationComplete } from './configuration';
+import { LinkdingApi } from './linkding';
 
-const SERVER_METADATA_CACHE_KEY = "ld_server_metadata_cache";
+const SERVER_METADATA_CACHE_KEY = 'ld_server_metadata_cache';
 
 export async function loadServerMetadata(url, precacheRequest = false) {
   // the function should be called with precacheRequest = true

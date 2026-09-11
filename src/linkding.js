@@ -22,17 +22,17 @@ export class LinkdingApi {
 
   async saveBookmark(bookmark, options = {}) {
     const configuration = this.configuration;
-    const query = ["disable_scraping"];
+    const query = ['disable_scraping'];
     if (options.disable_html_snapshot) {
-      query.push("disable_html_snapshot");
+      query.push('disable_html_snapshot');
     }
-    const queryString = query.join("&");
+    const queryString = query.join('&');
 
     return fetch(`${configuration.baseUrl}/api/bookmarks/?${queryString}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Token ${configuration.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(bookmark),
     }).then((response) => {
@@ -54,10 +54,10 @@ export class LinkdingApi {
     const configuration = this.configuration;
 
     return fetch(`${configuration.baseUrl}/api/bookmarks/${bookmarkId}/`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         Authorization: `Token ${configuration.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     }).then((response) => {
       if (response.status !== 204) {

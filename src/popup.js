@@ -1,8 +1,8 @@
-import { LitElement, html } from "lit";
-import "./popup-form.js";
-import "./popup-intro.js";
-import { getConfiguration, isConfigurationComplete } from "./configuration.js";
-import { LinkdingApi } from "./linkding.js";
+import { LitElement, html } from 'lit';
+import './popup-form.js';
+import './popup-intro.js';
+import { getConfiguration, isConfigurationComplete } from './configuration.js';
+import { LinkdingApi } from './linkding.js';
 
 export class Popup extends LitElement {
   static properties = {
@@ -43,11 +43,13 @@ export class Popup extends LitElement {
         .api="${this.api}"
       ></ld-popup-form>
 
-      ${!this.hasCompleteConfiguration
-        ? html` <ld-popup-intro></ld-popup-intro> `
-        : ""}
+      ${
+        !this.hasCompleteConfiguration
+          ? html` <ld-popup-intro></ld-popup-intro> `
+          : ''
+      }
     `;
   }
 }
 
-customElements.define("ld-popup", Popup);
+customElements.define('ld-popup', Popup);

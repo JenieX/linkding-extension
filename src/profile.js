@@ -1,8 +1,8 @@
-import { getStorageItem, setStorageItem } from "./browser";
-import { getConfiguration, isConfigurationComplete } from "./configuration";
-import { LinkdingApi } from "./linkding";
+import { getStorageItem, setStorageItem } from './browser';
+import { getConfiguration, isConfigurationComplete } from './configuration';
+import { LinkdingApi } from './linkding';
 
-const PROFILE_CACHE_KEY = "ld_profile_cache";
+const PROFILE_CACHE_KEY = 'ld_profile_cache';
 
 export async function updateProfile() {
   const configuration = await getConfiguration();
