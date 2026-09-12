@@ -6,9 +6,7 @@ import {
   getBrowserMetadata,
   getCurrentTabInfo,
   openOptions,
-  removeBadge,
   runSinglefile,
-  showBadge,
 } from './browser.js';
 import { getConfiguration } from './configuration.js';
 import { getProfile, updateProfile } from './profile.js';
@@ -157,7 +155,6 @@ class PopupForm extends LitElement {
     this.shared = this.configuration!.shareSelected!;
     this.unread = this.configuration!.unreadSelected!;
 
-    // If the bookmark already exists, prefill the form with the existing bookmark
     if (!serverMetadata) {
       return;
     }
@@ -209,13 +206,6 @@ class PopupForm extends LitElement {
 
       this.saveState = 'success';
 
-      // Show star badge on the tab to indicate that it's now bookmarked
-      // but only if precaching is enabled, since the badge will never
-      // show when browsing without precaching
-      if (this.extensionConfiguration?.precacheEnabled) {
-        showBadge(this.tabInfo!.id);
-      }
-
       // Close popup window after saving the bookmark, if configured
       if (
         this.extensionConfiguration?.closeAddBookmarkWindowOnSave === true &&
@@ -255,7 +245,6 @@ class PopupForm extends LitElement {
 
     try {
       await this.api!.deleteBookmark(this.existingBookmark.id);
-      removeBadge(this.tabInfo!.id);
       window.close();
     } catch (error) {
       this.saveState = 'error';

@@ -12,6 +12,8 @@
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
     "noEmit": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "types": ["chrome"]
   },
   "include": [

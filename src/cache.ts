@@ -15,7 +15,7 @@ async function loadServerMetadata(url, precacheRequest = false) {
     return null;
   }
 
-  if (configuration.precacheEnabled || !precacheRequest) {
+  if (!precacheRequest) {
     const api = new LinkdingApi(configuration);
     try {
       const tabMetadata = await api.check(url);

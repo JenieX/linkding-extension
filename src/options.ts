@@ -26,7 +26,6 @@ class Options extends LitElement {
   declare shareSelected: boolean;
   declare useBrowserMetadata: boolean;
   declare runSinglefile: boolean;
-  declare precacheEnabled: boolean;
   declare closeAddBookmarkWindowOnSave: boolean;
   declare closeAddBookmarkWindowOnSaveMs: number;
   declare isSuccess: boolean;
@@ -41,7 +40,6 @@ class Options extends LitElement {
     this.shareSelected = false;
     this.useBrowserMetadata = false;
     this.runSinglefile = false;
-    this.precacheEnabled = false;
     this.closeAddBookmarkWindowOnSave = false;
     this.closeAddBookmarkWindowOnSaveMs = 500;
     this.isSuccess = false;
@@ -68,7 +66,6 @@ class Options extends LitElement {
     this.shareSelected = config.shareSelected!;
     this.useBrowserMetadata = config.useBrowserMetadata!;
     this.runSinglefile = config.runSinglefile!;
-    this.precacheEnabled = config.precacheEnabled!;
     this.closeAddBookmarkWindowOnSave = config.closeAddBookmarkWindowOnSave!;
     this.closeAddBookmarkWindowOnSaveMs =
       config.closeAddBookmarkWindowOnSaveMs!;
@@ -84,7 +81,6 @@ class Options extends LitElement {
       shareSelected: this.shareSelected,
       useBrowserMetadata: this.useBrowserMetadata,
       runSinglefile: this.runSinglefile,
-      precacheEnabled: this.precacheEnabled,
       closeAddBookmarkWindowOnSave: this.closeAddBookmarkWindowOnSave,
       closeAddBookmarkWindowOnSaveMs: this.closeAddBookmarkWindowOnSaveMs,
     };
@@ -245,33 +241,6 @@ class Options extends LitElement {
               >documentation</a
             >
             for more information.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-checkbox">
-            <input
-              type="checkbox"
-              .checked="${this.precacheEnabled}"
-              @change="${(e) => this.handleInputChange(e, 'precacheEnabled')}"
-            />
-            <i class="form-icon"></i>
-            <span>Pre-load page information while browsing</span>
-          </label>
-          <div class="form-input-hint">
-            Pre-loads the page title and description while browsing, so that
-            these are already available when opening the add bookmark popup.
-            Otherwise the page title and description will be fetched after
-            opening popup, which can take a moment for them to show up.
-            <br />
-            <br />
-            Enabling this will also enable the extension to show a starred
-            linkding logo if the website in question is already bookmarked.
-            <br />
-            <br />
-            <strong>Note:</strong> This will send the URL of all websites that
-            you visit to your Linkding server, which will also be stored in the
-            server logs.
           </div>
         </div>
 

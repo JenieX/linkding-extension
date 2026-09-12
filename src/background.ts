@@ -1,8 +1,7 @@
-import { loadServerMetadata } from './cache';
 import { LinkdingApi } from './linkding';
 import { getConfiguration, isConfigurationComplete } from './configuration';
-import { getCurrentTabInfo, removeBadge, showBadge } from './browser';
-import { Configuration, ServerMetadata } from './types';
+import { getCurrentTabInfo } from './browser';
+import { Configuration } from './types';
 
 let api: LinkdingApi;
 let configuration: Configuration;
@@ -22,21 +21,6 @@ async function initApi() {
 
   return api !== undefined;
 }
-
-/* Dynamic badge */
-async function setDynamicBadge(
-  tabId: number,
-  tabMetadata: ServerMetadata | null,
-) {
-  // Set badge if tab is bookmarked
-  if (tabMetadata?.bookmark) {
-    showBadge(tabId);
-  } else {
-    removeBadge(tabId);
-  }
-}
-
-/* Omnibox / Search integration */
 
 chrome.omnibox.onInputStarted.addListener(async () => {
   const isReady = await initApi();
@@ -97,23 +81,4 @@ chrome.omnibox.onInputEntered.addListener(async (content, disposition) => {
       chrome.tabs.create({ url, active: false });
       break;
   }
-});
-
-/* Precache bookmark / website metadata when tab or URL changes */
-
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const tabInfo = await getCurrentTabInfo();
-  let tabMetadata = await loadServerMetadata(tabInfo.url, true);
-  setDynamicBadge(activeInfo.tabId, tabMetadata);
-});
-
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // Only interested in URL changes
-  // Ignore URL changes in non-active tabs
-  if (!changeInfo.url || !tab.active) {
-    return;
-  }
-
-  let tabMetadata = await loadServerMetadata(tab.url, true);
-  setDynamicBadge(tabId, tabMetadata);
 });

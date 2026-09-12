@@ -83,19 +83,6 @@ function openOptions() {
   window.close();
 }
 
-function showBadge(tabId) {
-  chrome.action.setBadgeText({ text: '★', tabId: tabId });
-  chrome.action.setBadgeTextColor({ color: '#FFE234', tabId: tabId });
-  chrome.action.setBadgeBackgroundColor({
-    color: 'rgba(100,100,100,1)',
-    tabId: tabId,
-  });
-}
-
-function removeBadge(tabId) {
-  chrome.action.setBadgeText({ text: '', tabId: tabId });
-}
-
 function runSinglefile() {
   const extensionId = 'mpiodijhokgodhhofbcjdecpffjipkle';
   chrome.runtime.sendMessage(extensionId, 'save-page');
@@ -112,8 +99,6 @@ export {
   getStorage,
   getStorageItem,
   openOptions,
-  removeBadge,
   runSinglefile,
   setStorageItem,
-  showBadge,
 };

@@ -4,7 +4,6 @@ interface Configuration {
   default_tags?: string;
   useBrowserMetadata?: boolean;
   runSinglefile?: boolean;
-  precacheEnabled?: boolean;
   closeAddBookmarkWindowOnSave?: boolean;
   closeAddBookmarkWindowOnSaveMs?: number;
   shareSelected?: boolean;
