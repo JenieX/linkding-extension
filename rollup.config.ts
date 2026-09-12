@@ -4,15 +4,17 @@ import resolve from '@rollup/plugin-node-resolve';
 import type { RollupOptions } from 'rollup';
 import typescript from '@rollup/plugin-typescript';
 
-// const production = !process.env.ROLLUP_WATCH;
+const production = !process.env.ROLLUP_WATCH;
 
 const backgroundConfig: RollupOptions = {
   input: 'src/background.ts',
+
   output: {
     sourcemap: true,
     format: 'esm',
     file: 'build/background.js',
   },
+
   plugins: [
     typescript({
       tsconfig: 'tsconfig.json',
@@ -25,28 +27,31 @@ const backgroundConfig: RollupOptions = {
       ],
     }),
 
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration —
-    // consult the documentation for details:
-    // https://github.com/rollup/rollup-plugin-commonjs
     resolve({ browser: true }),
 
     // production && terser(),
   ],
+
   watch: {
     clearScreen: false,
+  },
+
+  treeshake: {
+    propertyReadSideEffects: false,
+    unknownGlobalSideEffects: false,
   },
 };
 
 const bundleConfig: RollupOptions = {
   input: 'src/index.ts',
+
   output: {
     sourcemap: true,
     format: 'iife',
     name: 'linkding',
     file: 'build/bundle.js',
   },
+
   plugins: [
     typescript({
       tsconfig: 'tsconfig.json',
@@ -66,19 +71,20 @@ const bundleConfig: RollupOptions = {
       ],
     }),
 
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration —
-    // consult the documentation for details:
-    // https://github.com/rollup/rollup-plugin-commonjs
     resolve({
       browser: true,
     }),
 
     // production && terser(),
   ],
+
   watch: {
     clearScreen: false,
+  },
+
+  treeshake: {
+    propertyReadSideEffects: false,
+    unknownGlobalSideEffects: false,
   },
 };
 

@@ -7,7 +7,8 @@ import {
   showSuccessBadge,
 } from './browser';
 import { LinkdingApi } from './linkding';
-import { Configuration } from './types';
+import { Configuration, ServerMetadata } from './types';
+import { isNumber, assertedType } from '@jeniex/utils/browser';
 
 let api: LinkdingApi;
 let configuration: Configuration;
@@ -31,7 +32,10 @@ async function initApi() {
 }
 
 /* Dynamic badge */
-async function setDynamicBadge(tabId, tabMetadata) {
+async function setDynamicBadge(
+  tabId: number,
+  tabMetadata: ServerMetadata | null,
+) {
   // Set badge if tab is bookmarked
   if (tabMetadata?.bookmark) {
     showBadge(tabId);
@@ -173,7 +177,7 @@ async function saveToLinkding(url?: string) {
     showSuccessBadge(currentTab.id);
     setTimeout(async () => {
       const tabMetadata = await loadServerMetadata(currentTab.url, true);
-      setDynamicBadge(currentTab.id, tabMetadata);
+      setDynamicBadge(assertedType(currentTab.id, isNumber), tabMetadata);
     }, 1000);
   } catch (error) {
     console.error('Error saving link to linkding:', error);
