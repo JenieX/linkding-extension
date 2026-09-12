@@ -13,7 +13,7 @@ import {
 import { getConfiguration } from './configuration.js';
 import { getProfile, updateProfile } from './profile.js';
 import { icons } from './icons';
-import { loadServerMetadata, clearCachedServerMetadata } from './cache.js';
+import { loadServerMetadata } from './cache.js';
 import { Bookmark, Configuration, Profile, TabInfo } from './types';
 
 export class PopupForm extends LitElement {
@@ -206,7 +206,6 @@ export class PopupForm extends LitElement {
       await this.api!.saveBookmark(bookmark, {
         disable_html_snapshot: this.extensionConfiguration?.runSinglefile,
       });
-      await clearCachedServerMetadata();
 
       this.saveState = 'success';
 
@@ -256,7 +255,6 @@ export class PopupForm extends LitElement {
 
     try {
       await this.api!.deleteBookmark(this.existingBookmark.id);
-      await clearCachedServerMetadata();
       removeBadge(this.tabInfo!.id);
       window.close();
     } catch (error) {

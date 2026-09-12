@@ -1,11 +1,9 @@
-import { getStorageItem, setStorageItem } from './browser';
-import { getConfiguration, isConfigurationComplete } from './configuration';
 import { LinkdingApi } from './linkding';
-import { ServerMetadata } from './types';
-
-const SERVER_METADATA_CACHE_KEY = 'ld_server_metadata_cache';
+import { getConfiguration, isConfigurationComplete } from './configuration';
 
 export async function loadServerMetadata(url, precacheRequest = false) {
+  // console.log(new Error().stack);
+
   // the function should be called with precacheRequest = true
   // anytime before the user has consciously decided to bookmark it.
   // see https://github.com/sissbruecker/linkding-extension/issues/36
@@ -17,14 +15,7 @@ export async function loadServerMetadata(url, precacheRequest = false) {
     return null;
   }
 
-  // Check for cached metadata first
-  const cachedMetadata = await getCachedServerMetadata();
-  if (cachedMetadata && cachedMetadata.metadata.url === url) {
-    return cachedMetadata;
-  }
-
   if (configuration.precacheEnabled || !precacheRequest) {
-    // Load metadata if not cached
     const api = new LinkdingApi(configuration);
     try {
       const tabMetadata = await api.check(url);
@@ -33,7 +24,7 @@ export async function loadServerMetadata(url, precacheRequest = false) {
       if (tabMetadata.bookmark && !tabMetadata.bookmark.date_added) {
         tabMetadata.bookmark = await api.getBookmark(tabMetadata.bookmark.id);
       }
-      await cacheServerMetadata(tabMetadata);
+
       return tabMetadata;
     } catch (e) {
       console.error(e);
@@ -42,18 +33,4 @@ export async function loadServerMetadata(url, precacheRequest = false) {
   } else {
     return null;
   }
-}
-
-export async function getCachedServerMetadata() {
-  const json = await getStorageItem(SERVER_METADATA_CACHE_KEY);
-  return json ? (JSON.parse(json as string) as ServerMetadata) : null;
-}
-
-export async function cacheServerMetadata(tabMetadata) {
-  const json = JSON.stringify(tabMetadata);
-  await setStorageItem(SERVER_METADATA_CACHE_KEY, json);
-}
-
-export async function clearCachedServerMetadata() {
-  await cacheServerMetadata(null);
 }
