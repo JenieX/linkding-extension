@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { getCurrentWord, getCurrentWordBounds } from './util.js';
 
-export class TagAutocomplete extends LitElement {
+class TagAutocomplete extends LitElement {
   static properties = {
     inputId: { type: String },
     inputName: { type: String },
@@ -188,3 +188,5 @@ export class TagAutocomplete extends LitElement {
 }
 
 customElements.define('ld-tag-autocomplete', TagAutocomplete);
+
+export { TagAutocomplete };

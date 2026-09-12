@@ -5,7 +5,7 @@ import { Profile } from './types';
 
 const PROFILE_CACHE_KEY = 'ld_profile_cache';
 
-export async function updateProfile() {
+async function updateProfile() {
   const configuration = await getConfiguration();
   const hasCompleteConfiguration = isConfigurationComplete(configuration);
 
@@ -26,12 +26,14 @@ export async function updateProfile() {
   }
 }
 
-export async function getProfile() {
+async function getProfile() {
   const json = await getStorageItem(PROFILE_CACHE_KEY);
   return json ? (JSON.parse(json as string) as Profile) : null;
 }
 
-export async function cacheProfile(profile: Profile) {
+async function cacheProfile(profile: Profile) {
   const json = JSON.stringify(profile);
   await setStorageItem(PROFILE_CACHE_KEY, json);
 }
+
+export { cacheProfile, getProfile, updateProfile };

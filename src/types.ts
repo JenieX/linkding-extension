@@ -70,12 +70,17 @@ interface BrowserMetadata {
   description: string;
 }
 
+interface SearchOptions {
+  limit: number;
+}
+
 export type {
   Bookmark,
+  BrowserMetadata,
   Configuration,
   Profile,
   SaveBookmarkOptions,
+  SearchOptions,
   ServerMetadata,
   TabInfo,
-  BrowserMetadata,
 };

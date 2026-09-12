@@ -1,7 +1,7 @@
 import { LinkdingApi } from './linkding';
 import { getConfiguration, isConfigurationComplete } from './configuration';
 
-export async function loadServerMetadata(url, precacheRequest = false) {
+async function loadServerMetadata(url, precacheRequest = false) {
   // console.log(new Error().stack);
 
   // the function should be called with precacheRequest = true
@@ -34,3 +34,5 @@ export async function loadServerMetadata(url, precacheRequest = false) {
     return null;
   }
 }
+
+export { loadServerMetadata };

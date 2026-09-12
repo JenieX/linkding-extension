@@ -1,4 +1,4 @@
-export function getCurrentWordBounds(input) {
+function getCurrentWordBounds(input) {
   const text = input.value;
   const end = input.selectionStart;
   let start = end;
@@ -13,8 +13,10 @@ export function getCurrentWordBounds(input) {
   return { start, end };
 }
 
-export function getCurrentWord(input) {
+function getCurrentWord(input) {
   const bounds = getCurrentWordBounds(input);
 
   return input.value.substring(bounds.start, bounds.end);
 }
+
+export { getCurrentWord, getCurrentWordBounds };

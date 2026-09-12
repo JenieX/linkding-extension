@@ -16,7 +16,7 @@ import { icons } from './icons';
 import { loadServerMetadata } from './cache.js';
 import { Bookmark, Configuration, Profile, TabInfo } from './types';
 
-export class PopupForm extends LitElement {
+class PopupForm extends LitElement {
   static properties = {
     api: { type: Object },
     configuration: { type: Object },
@@ -543,3 +543,5 @@ export class PopupForm extends LitElement {
 }
 
 customElements.define('ld-popup-form', PopupForm);
+
+export { PopupForm };

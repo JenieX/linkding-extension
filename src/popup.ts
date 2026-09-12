@@ -5,7 +5,7 @@ import { Configuration } from './types.js';
 import { LinkdingApi } from './linkding.js';
 import { getConfiguration, isConfigurationComplete } from './configuration.js';
 
-export class Popup extends LitElement {
+class Popup extends LitElement {
   static properties = {
     hasCompleteConfiguration: { type: Boolean, state: true },
     configuration: { type: Object, state: true },
@@ -58,3 +58,5 @@ export class Popup extends LitElement {
 }
 
 customElements.define('ld-popup', Popup);
+
+export { Popup };

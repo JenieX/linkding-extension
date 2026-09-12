@@ -1,6 +1,6 @@
 import { BrowserMetadata, TabInfo } from './types';
 
-export async function getCurrentTabInfo(): Promise<TabInfo> {
+async function getCurrentTabInfo(): Promise<TabInfo> {
   const tabs = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -15,7 +15,7 @@ export async function getCurrentTabInfo(): Promise<TabInfo> {
   };
 }
 
-export async function getBrowserMetadata(): Promise<BrowserMetadata> {
+async function getBrowserMetadata(): Promise<BrowserMetadata> {
   const tabs = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -57,7 +57,7 @@ export async function getBrowserMetadata(): Promise<BrowserMetadata> {
     .catch(errorHandler);
 }
 
-export function getStorage() {
+function getStorage() {
   if (typeof chrome.storage !== 'undefined') {
     return chrome.storage.local;
   } else {
@@ -65,7 +65,7 @@ export function getStorage() {
   }
 }
 
-export async function getStorageItem(key) {
+async function getStorageItem(key) {
   const storage = getStorage();
   const results = await storage.get([key]);
   let data = results[key];
@@ -73,17 +73,17 @@ export async function getStorageItem(key) {
   return data;
 }
 
-export function setStorageItem(key, value) {
+function setStorageItem(key, value) {
   const storage = getStorage();
   return storage.set({ [key]: value });
 }
 
-export function openOptions() {
+function openOptions() {
   chrome.runtime.openOptionsPage();
   window.close();
 }
 
-export function showBadge(tabId) {
+function showBadge(tabId) {
   chrome.action.setBadgeText({ text: '★', tabId: tabId });
   chrome.action.setBadgeTextColor({ color: '#FFE234', tabId: tabId });
   chrome.action.setBadgeBackgroundColor({
@@ -92,15 +92,28 @@ export function showBadge(tabId) {
   });
 }
 
-export function removeBadge(tabId) {
+function removeBadge(tabId) {
   chrome.action.setBadgeText({ text: '', tabId: tabId });
 }
 
-export function runSinglefile() {
+function runSinglefile() {
   const extensionId = 'mpiodijhokgodhhofbcjdecpffjipkle';
   chrome.runtime.sendMessage(extensionId, 'save-page');
 }
 
-export function createTab(url) {
+function createTab(url) {
   chrome.tabs.create({ url });
 }
+
+export {
+  createTab,
+  getBrowserMetadata,
+  getCurrentTabInfo,
+  getStorage,
+  getStorageItem,
+  openOptions,
+  removeBadge,
+  runSinglefile,
+  setStorageItem,
+  showBadge,
+};

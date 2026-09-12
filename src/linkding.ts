@@ -3,10 +3,11 @@ import {
   Configuration,
   Profile,
   SaveBookmarkOptions,
+  SearchOptions,
   ServerMetadata,
 } from './types';
 
-export class LinkdingApi {
+class LinkdingApi {
   private configuration: Configuration;
 
   constructor(configuration: Configuration) {
@@ -91,7 +92,7 @@ export class LinkdingApi {
     });
   }
 
-  async search(text, options) {
+  async search(text: string, options: SearchOptions) {
     const configuration = this.configuration;
     const q = encodeURIComponent(text);
     const limit = options.limit || 100;
@@ -162,3 +163,5 @@ export class LinkdingApi {
       .catch(() => false);
   }
 }
+
+export { LinkdingApi };

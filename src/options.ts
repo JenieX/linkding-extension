@@ -3,7 +3,7 @@ import { LinkdingApi } from './linkding.js';
 import { getConfiguration, saveConfiguration } from './configuration.js';
 import { icons } from './icons';
 
-export class Options extends LitElement {
+class Options extends LitElement {
   static properties = {
     baseUrl: { type: String, state: true },
     token: { type: String, state: true },
@@ -378,3 +378,5 @@ export class Options extends LitElement {
 }
 
 customElements.define('ld-options', Options);
+
+export { Options };

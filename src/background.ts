@@ -1,5 +1,4 @@
 import { loadServerMetadata } from './cache';
-import { isNumber, assertedType } from '@jeniex/utils/browser';
 import { LinkdingApi } from './linkding';
 import { getConfiguration, isConfigurationComplete } from './configuration';
 import { getCurrentTabInfo, removeBadge, showBadge } from './browser';

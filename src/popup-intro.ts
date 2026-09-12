@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { openOptions } from './browser.js';
 
-export class PopupIntro extends LitElement {
+class PopupIntro extends LitElement {
   createRenderRoot() {
     return this;
   }
@@ -45,3 +45,5 @@ export class PopupIntro extends LitElement {
 }
 
 customElements.define('ld-popup-intro', PopupIntro);
+
+export { PopupIntro };

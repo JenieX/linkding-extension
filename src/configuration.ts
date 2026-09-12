@@ -13,7 +13,7 @@ const DEFAULTS: Configuration = {
   closeAddBookmarkWindowOnSaveMs: 500,
 };
 
-export async function getConfiguration(): Promise<Configuration> {
+async function getConfiguration(): Promise<Configuration> {
   const configJson = await getStorageItem(CONFIG_KEY);
   const config = configJson
     ? (JSON.parse(configJson as string) as Configuration)
@@ -25,11 +25,13 @@ export async function getConfiguration(): Promise<Configuration> {
   };
 }
 
-export async function saveConfiguration(config) {
+async function saveConfiguration(config) {
   const configJson = JSON.stringify(config);
   await setStorageItem(CONFIG_KEY, configJson);
 }
 
-export function isConfigurationComplete(config) {
+function isConfigurationComplete(config) {
   return config.baseUrl && config.token;
 }
+
+export { getConfiguration, isConfigurationComplete, saveConfiguration };

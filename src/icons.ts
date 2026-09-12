@@ -1,6 +1,6 @@
 import { html } from 'lit';
 
-export const icons = {
+const icons = {
   success() {
     return html`
       <svg
@@ -85,3 +85,5 @@ export const icons = {
     `;
   },
 };
+
+export { icons };
