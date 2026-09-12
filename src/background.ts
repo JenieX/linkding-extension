@@ -1,14 +1,9 @@
 import { loadServerMetadata } from './cache';
-import { getConfiguration, isConfigurationComplete } from './configuration';
-import {
-  getCurrentTabInfo,
-  removeBadge,
-  showBadge,
-  showSuccessBadge,
-} from './browser';
-import { LinkdingApi } from './linkding';
-import { Configuration, ServerMetadata } from './types';
 import { isNumber, assertedType } from '@jeniex/utils/browser';
+import { LinkdingApi } from './linkding';
+import { getConfiguration, isConfigurationComplete } from './configuration';
+import { getCurrentTabInfo, removeBadge, showBadge } from './browser';
+import { Configuration, ServerMetadata } from './types';
 
 let api: LinkdingApi;
 let configuration: Configuration;
@@ -21,8 +16,6 @@ async function initApi() {
 
   configuration = await getConfiguration();
   hasCompleteConfiguration = isConfigurationComplete(configuration);
-
-  console.log(configuration);
 
   if (hasCompleteConfiguration) {
     api = new LinkdingApi(configuration);
@@ -61,7 +54,7 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   }
 
   api
-    .search(text, { limit: 5 })
+    .search(text, { limit: 9 })
     .then((results) => {
       const bookmarkSuggestions = results.map((bookmark) => ({
         content: bookmark.url,
@@ -125,61 +118,3 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   let tabMetadata = await loadServerMetadata(tab.url, true);
   setDynamicBadge(tabId, tabMetadata);
 });
-
-/* Context Menu */
-
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'save-to-linkding',
-    title: 'Save to linkding',
-    contexts: ['link'],
-  });
-});
-
-chrome.contextMenus.onClicked.addListener(async (info) => {
-  if (info.menuItemId === 'save-to-linkding') {
-    await saveToLinkding(info.linkUrl);
-  }
-});
-
-async function saveToLinkding(url?: string) {
-  const isReady = await initApi();
-  if (!isReady) {
-    return;
-  }
-
-  try {
-    const serverMetadata = await loadServerMetadata(url, false);
-    const title = serverMetadata!.metadata.title ?? '';
-    const description = serverMetadata!.metadata.description ?? '';
-    const tagNames = configuration.default_tags
-      ? configuration.default_tags
-          .split(' ')
-          .map((tag) => tag.trim())
-          .filter((tag) => !!tag)
-      : [];
-    const unread = configuration.unreadSelected ?? false;
-    const shared = configuration.shareSelected ?? false;
-
-    const bookmark = {
-      url,
-      title,
-      description,
-      tag_names: tagNames,
-      unread,
-      shared,
-    };
-
-    await api.saveBookmark(bookmark);
-
-    // Show success badge temporarily
-    const currentTab = await getCurrentTabInfo();
-    showSuccessBadge(currentTab.id);
-    setTimeout(async () => {
-      const tabMetadata = await loadServerMetadata(currentTab.url, true);
-      setDynamicBadge(assertedType(currentTab.id, isNumber), tabMetadata);
-    }, 1000);
-  } catch (error) {
-    console.error('Error saving link to linkding:', error);
-  }
-}

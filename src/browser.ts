@@ -96,15 +96,6 @@ export function removeBadge(tabId) {
   chrome.action.setBadgeText({ text: '', tabId: tabId });
 }
 
-export function showSuccessBadge(tabId) {
-  chrome.action.setBadgeText({ text: '✔', tabId: tabId });
-  chrome.action.setBadgeTextColor({ color: '#FFFFFF', tabId: tabId });
-  chrome.action.setBadgeBackgroundColor({
-    color: 'rgba(76,175,80,1)',
-    tabId: tabId,
-  });
-}
-
 export function runSinglefile() {
   const extensionId = 'mpiodijhokgodhhofbcjdecpffjipkle';
   chrome.runtime.sendMessage(extensionId, 'save-page');
