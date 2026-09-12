@@ -57,25 +57,15 @@ async function getBrowserMetadata(): Promise<BrowserMetadata> {
     .catch(errorHandler);
 }
 
-function getStorage() {
-  if (typeof chrome.storage !== 'undefined') {
-    return chrome.storage.local;
-  } else {
-    throw new Error('Storage API not found.');
-  }
-}
-
 async function getStorageItem(key) {
-  const storage = getStorage();
-  const results = await storage.get([key]);
+  const results = await chrome.storage.local.get([key]);
   let data = results[key];
 
   return data;
 }
 
 function setStorageItem(key, value) {
-  const storage = getStorage();
-  return storage.set({ [key]: value });
+  return chrome.storage.local.set({ [key]: value });
 }
 
 function openOptions() {
@@ -96,7 +86,6 @@ export {
   createTab,
   getBrowserMetadata,
   getCurrentTabInfo,
-  getStorage,
   getStorageItem,
   openOptions,
   runSinglefile,
