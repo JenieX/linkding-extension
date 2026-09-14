@@ -19,6 +19,7 @@ async function loadServerMetadata(url, precacheRequest = false) {
     const api = new LinkdingApi(configuration);
     try {
       const tabMetadata = await api.check(url);
+
       // Linkding <v1.17 does not return full bookmark data from check API
       // In that case fetch the bookmark with a separate request
       if (tabMetadata.bookmark && !tabMetadata.bookmark.date_added) {

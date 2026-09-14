@@ -1,5 +1,5 @@
 import {
-  Bookmark,
+  ServerBookmark,
   Configuration,
   Profile,
   SaveBookmarkOptions,
@@ -14,7 +14,7 @@ class LinkdingApi {
     this.configuration = configuration;
   }
 
-  async getBookmark(bookmarkId) {
+  async getBookmark(bookmarkId: number) {
     const configuration = this.configuration;
 
     return fetch(`${configuration.baseUrl}/api/bookmarks/${bookmarkId}/`, {
@@ -23,7 +23,7 @@ class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json() as Promise<Bookmark>;
+        return response.json() as Promise<ServerBookmark>;
       }
       return Promise.reject(
         `Error retrieving bookmark: ${response.statusText}`,
@@ -97,21 +97,22 @@ class LinkdingApi {
     const q = encodeURIComponent(text);
     const limit = options.limit || 100;
 
-    return fetch(
+    const response = await fetch(
       `${configuration.baseUrl}/api/bookmarks/?q=${q}&limit=${limit}`,
       {
         headers: {
           Authorization: `Token ${configuration.token}`,
         },
       },
-    ).then((response) => {
-      if (response.status === 200) {
-        return response.json().then((body) => body.results);
-      }
-      return Promise.reject(
-        `Error searching bookmarks: ${response.statusText}`,
-      );
-    });
+    );
+
+    if (response.status !== 200) {
+      throw new Error(`Error searching bookmarks: ${response.statusText}`);
+    }
+
+    const body = (await response.json()) as { results: ServerBookmark[] };
+
+    return body.results;
   }
 
   async check(url) {

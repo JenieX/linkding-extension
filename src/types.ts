@@ -14,26 +14,33 @@ interface SaveBookmarkOptions {
   disable_html_snapshot?: boolean;
 }
 
-interface Bookmark {
+interface ServerBookmark {
   id: number;
   url: string;
   title: string;
   description: string;
   notes: string;
-  web_archive_snapshot_url: string;
-  is_archived: boolean;
+  tag_names: string[];
   unread: boolean;
   shared: boolean;
-  tag_names: string[];
-  date_added?: string;
+
+  web_archive_snapshot_url: string;
+  is_archived: boolean;
+  date_added: string;
   date_modified: string;
+  website_title: null | string;
 }
+
+interface Bookmark extends Pick<
+  ServerBookmark,
+  'url' | 'title' | 'description' | 'notes' | 'tag_names' | 'unread' | 'shared'
+> {}
 
 interface ServerMetadata {
   // Check this
   auto_tags: string[];
 
-  bookmark: Bookmark;
+  bookmark: ServerBookmark;
 
   metadata: {
     description: string;
@@ -75,6 +82,7 @@ interface SearchOptions {
 
 export type {
   Bookmark,
+  ServerBookmark,
   BrowserMetadata,
   Configuration,
   Profile,

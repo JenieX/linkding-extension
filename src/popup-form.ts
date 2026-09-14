@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, PropertyValues, html, nothing } from 'lit';
 import './tag-autocomplete';
 import { LinkdingApi } from './linkding';
 import {
@@ -12,7 +12,13 @@ import { getConfiguration } from './configuration.js';
 import { getProfile, updateProfile } from './profile.js';
 import { icons } from './icons';
 import { loadServerMetadata } from './cache.js';
-import { Bookmark, Configuration, Profile, TabInfo } from './types';
+import {
+  ServerBookmark,
+  Configuration,
+  Profile,
+  TabInfo,
+  Bookmark,
+} from './types';
 
 class PopupForm extends LitElement {
   static properties = {
@@ -55,7 +61,7 @@ class PopupForm extends LitElement {
   declare saveState: '' | 'loading' | 'success' | 'error';
   declare errorMessage: string;
   declare availableTagNames: string[];
-  declare existingBookmark: Bookmark | null;
+  declare existingBookmark: ServerBookmark | null;
   declare editNotes: boolean;
   declare profile: Profile | null;
   declare tabInfo: TabInfo | null;
@@ -93,8 +99,8 @@ class PopupForm extends LitElement {
     return this;
   }
 
-  firstUpdated(props) {
-    super.firstUpdated(props);
+  firstUpdated(changedProperties: PropertyValues<this>) {
+    super.firstUpdated(changedProperties);
 
     this.classList.add('bookmark-form');
   }
@@ -181,13 +187,14 @@ class PopupForm extends LitElement {
     }
   }
 
-  async handleSubmit(e) {
-    e.preventDefault();
+  async handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
     const tagNames = this.tags
       .split(' ')
       .map((tag) => tag.trim())
       .filter((tag) => !!tag);
-    const bookmark = {
+    const bookmark: Bookmark = {
       url: this.url,
       title: this.title || '',
       description: this.description || '',
