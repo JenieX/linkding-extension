@@ -1,6 +1,9 @@
+import { asserted } from '../node_modules/@jeniex/utils/browser/index.js';
+
+/** @param {HTMLInputElement} input */
 function getCurrentWordBounds(input) {
   const text = input.value;
-  const end = input.selectionStart;
+  const end = asserted(input.selectionStart);
   let start = end;
 
   let currentChar = text.charAt(start - 1);
@@ -13,6 +16,7 @@ function getCurrentWordBounds(input) {
   return { start, end };
 }
 
+/** @param {HTMLInputElement} input */
 function getCurrentWord(input) {
   const bounds = getCurrentWordBounds(input);
 

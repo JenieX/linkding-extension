@@ -16,6 +16,7 @@ class TagAutocomplete extends LitElement {
 
   constructor() {
     super();
+
     this.inputId = '';
     this.inputName = '';
     this.value = '';
@@ -44,11 +45,13 @@ class TagAutocomplete extends LitElement {
     this.close();
   }
 
-  handleInput(e) {
-    this.value = e.target.value;
+  /** @param {InputEvent} event */
+  handleInput(event) {
+    this.value = /** @type {HTMLInputElement} */ (event.target).value;
+
     this.fireValueChange();
 
-    const word = getCurrentWord(this.input);
+    const word = getCurrentWord(asserted(this.input));
 
     this.suggestions = word
       ? this.tags.filter(
@@ -69,23 +72,29 @@ class TagAutocomplete extends LitElement {
     );
   }
 
-  handleKeyDown(e) {
-    if (this.isOpen && (e.keyCode === 13 || e.keyCode === 9)) {
+  /** @param {KeyboardEvent} event */
+  handleKeyDown(event) {
+    console.log(event.keyCode);
+
+    if (this.isOpen && (event.key === 'Enter' || event.key === 'Tab')) {
       const suggestion = this.suggestions[this.selectedIndex];
       this.complete(suggestion);
-      e.preventDefault();
+      event.preventDefault();
     }
-    if (e.keyCode === 27) {
+
+    if (event.key === 'Escape') {
       this.close();
-      e.preventDefault();
+      event.preventDefault();
     }
-    if (e.keyCode === 38) {
+
+    if (event.key === 'ArrowUp') {
       this.updateSelection(-1);
-      e.preventDefault();
+      event.preventDefault();
     }
-    if (e.keyCode === 40) {
+
+    if (event.key === 'ArrowDown') {
       this.updateSelection(1);
-      e.preventDefault();
+      event.preventDefault();
     }
   }
 
@@ -100,19 +109,22 @@ class TagAutocomplete extends LitElement {
     this.selectedIndex = 0;
   }
 
+  /** @param {string} suggestion */
   complete(suggestion) {
-    const bounds = getCurrentWordBounds(this.input);
+    const bounds = getCurrentWordBounds(asserted(this.input));
     const inputValue = asserted(this.input).value;
     this.value =
       inputValue.substring(0, bounds.start) +
       suggestion +
       ' ' +
       inputValue.substring(bounds.end);
+
     this.fireValueChange();
 
     this.close();
   }
 
+  /** @param {number} dir */
   updateSelection(dir) {
     const length = this.suggestions.length;
     let newIndex = this.selectedIndex + dir;
@@ -153,14 +165,14 @@ class TagAutocomplete extends LitElement {
           }"
         >
           ${this.suggestions.map(
-            (tag, i) => html`
+            (tag, index) => html`
               <li
-                class="menu-item ${this.selectedIndex === i ? 'selected' : ''}"
+                class="menu-item ${this.selectedIndex === index ? 'selected' : ''}"
               >
                 <a
                   href="#"
-                  @mousedown="${(e) => {
-                    e.preventDefault();
+                  @mousedown="${(/** @type {MouseEvent} */ event) => {
+                    event.preventDefault();
                     this.complete(tag);
                   }}"
                 >
