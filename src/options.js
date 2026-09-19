@@ -1,9 +1,10 @@
-import { LitElement, html } from "lit";
-import { getConfiguration, saveConfiguration } from "./configuration.js";
-import { LinkdingApi } from "./linkding.js";
-import { icons } from "./icons";
+import { LitElement, html } from '../libs/lit-core.min.js';
+import { asserted } from '../node_modules/@jeniex/utils/browser/index.js';
+import { LinkdingApi } from './linkding.js';
+import { getConfiguration, saveConfiguration } from './configuration.js';
+import { icons } from './icons.js';
 
-export class Options extends LitElement {
+class Options extends LitElement {
   static properties = {
     baseUrl: { type: String, state: true },
     token: { type: String, state: true },
@@ -21,14 +22,13 @@ export class Options extends LitElement {
 
   constructor() {
     super();
-    this.baseUrl = "";
-    this.token = "";
-    this.default_tags = "";
+    this.baseUrl = '';
+    this.token = '';
+    this.default_tags = '';
     this.unreadSelected = false;
     this.shareSelected = false;
     this.useBrowserMetadata = false;
     this.runSinglefile = false;
-    this.precacheEnabled = false;
     this.closeAddBookmarkWindowOnSave = false;
     this.closeAddBookmarkWindowOnSaveMs = 500;
     this.isSuccess = false;
@@ -42,7 +42,7 @@ export class Options extends LitElement {
   firstUpdated(props) {
     super.firstUpdated(props);
 
-    this.classList.add("options");
+    this.classList.add('options');
     this.init();
   }
 
@@ -50,14 +50,24 @@ export class Options extends LitElement {
     const config = await getConfiguration();
     this.baseUrl = config.baseUrl;
     this.token = config.token;
-    this.default_tags = config.default_tags;
-    this.unreadSelected = config.unreadSelected;
-    this.shareSelected = config.shareSelected;
-    this.useBrowserMetadata = config.useBrowserMetadata;
-    this.runSinglefile = config.runSinglefile;
-    this.precacheEnabled = config.precacheEnabled;
-    this.closeAddBookmarkWindowOnSave = config.closeAddBookmarkWindowOnSave;
-    this.closeAddBookmarkWindowOnSaveMs = config.closeAddBookmarkWindowOnSaveMs;
+    this.default_tags = asserted(config.default_tags);
+
+    if (config.unreadSelected !== undefined) {
+      this.unreadSelected = config.unreadSelected;
+    }
+
+    if (config.shareSelected !== undefined) {
+      this.shareSelected = config.shareSelected;
+    }
+
+    this.useBrowserMetadata = asserted(config.useBrowserMetadata);
+    this.runSinglefile = asserted(config.runSinglefile);
+    this.closeAddBookmarkWindowOnSave = asserted(
+      config.closeAddBookmarkWindowOnSave,
+    );
+    this.closeAddBookmarkWindowOnSaveMs = asserted(
+      config.closeAddBookmarkWindowOnSaveMs,
+    );
   }
 
   async handleSubmit(e) {
@@ -70,12 +80,11 @@ export class Options extends LitElement {
       shareSelected: this.shareSelected,
       useBrowserMetadata: this.useBrowserMetadata,
       runSinglefile: this.runSinglefile,
-      precacheEnabled: this.precacheEnabled,
       closeAddBookmarkWindowOnSave: this.closeAddBookmarkWindowOnSave,
       closeAddBookmarkWindowOnSaveMs: this.closeAddBookmarkWindowOnSaveMs,
     };
 
-    const testResult = await new LinkdingApi(config).testConnection(config);
+    const testResult = await new LinkdingApi(config).testConnection();
 
     if (testResult) {
       await saveConfiguration(config);
@@ -89,7 +98,7 @@ export class Options extends LitElement {
 
   handleInputChange(e, property) {
     this[property] =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   }
 
   render() {
@@ -113,7 +122,7 @@ export class Options extends LitElement {
             id="input-base-url"
             placeholder="https://linkding.mydomain.com"
             .value="${this.baseUrl}"
-            @input="${(e) => this.handleInputChange(e, "baseUrl")}"
+            @input="${(e) => this.handleInputChange(e, 'baseUrl')}"
           />
           <div class="form-input-hint">
             The base URL of your linkding installation, <b>without</b> the
@@ -131,7 +140,7 @@ export class Options extends LitElement {
             id="input-token"
             placeholder="Token"
             .value="${this.token}"
-            @input="${(e) => this.handleInputChange(e, "token")}"
+            @input="${(e) => this.handleInputChange(e, 'token')}"
           />
           <div class="form-input-hint">
             Used to authenticate against the linkding API. You can find this on
@@ -148,7 +157,7 @@ export class Options extends LitElement {
             id="input-default-tags"
             placeholder=""
             .value="${this.default_tags}"
-            @input="${(e) => this.handleInputChange(e, "default_tags")}"
+            @input="${(e) => this.handleInputChange(e, 'default_tags')}"
           />
           <div class="form-input-hint">
             Set of tags that should be added to new bookmarks by default.
@@ -160,7 +169,7 @@ export class Options extends LitElement {
             <input
               type="checkbox"
               .checked="${this.unreadSelected}"
-              @change="${(e) => this.handleInputChange(e, "unreadSelected")}"
+              @change="${(e) => this.handleInputChange(e, 'unreadSelected')}"
             />
             <i class="form-icon"></i>
             <span>Pre-select unread when adding bookmark</span>
@@ -175,7 +184,7 @@ export class Options extends LitElement {
             <input
               type="checkbox"
               .checked="${this.shareSelected}"
-              @change="${(e) => this.handleInputChange(e, "shareSelected")}"
+              @change="${(e) => this.handleInputChange(e, 'shareSelected')}"
             />
             <i class="form-icon"></i>
             <span>Pre-select share when saving bookmark</span>
@@ -192,7 +201,7 @@ export class Options extends LitElement {
               type="checkbox"
               .checked="${this.useBrowserMetadata}"
               @change="${(e) =>
-                this.handleInputChange(e, "useBrowserMetadata")}"
+                this.handleInputChange(e, 'useBrowserMetadata')}"
             />
             <i class="form-icon"></i>
             <span>Use browser metadata</span>
@@ -212,7 +221,7 @@ export class Options extends LitElement {
             <input
               type="checkbox"
               .checked="${this.runSinglefile}"
-              @change="${(e) => this.handleInputChange(e, "runSinglefile")}"
+              @change="${(e) => this.handleInputChange(e, 'runSinglefile')}"
             />
             <i class="form-icon"></i>
             <span>Run Singlefile after adding new bookmark</span>
@@ -238,36 +247,9 @@ export class Options extends LitElement {
           <label class="form-checkbox">
             <input
               type="checkbox"
-              .checked="${this.precacheEnabled}"
-              @change="${(e) => this.handleInputChange(e, "precacheEnabled")}"
-            />
-            <i class="form-icon"></i>
-            <span>Pre-load page information while browsing</span>
-          </label>
-          <div class="form-input-hint">
-            Pre-loads the page title and description while browsing, so that
-            these are already available when opening the add bookmark popup.
-            Otherwise the page title and description will be fetched after
-            opening popup, which can take a moment for them to show up.
-            <br />
-            <br />
-            Enabling this will also enable the extension to show a starred
-            linkding logo if the website in question is already bookmarked.
-            <br />
-            <br />
-            <strong>Note:</strong> This will send the URL of all websites that
-            you visit to your Linkding server, which will also be stored in the
-            server logs.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-checkbox">
-            <input
-              type="checkbox"
               .checked="${this.closeAddBookmarkWindowOnSave}"
               @change="${(e) =>
-                this.handleInputChange(e, "closeAddBookmarkWindowOnSave")}"
+                this.handleInputChange(e, 'closeAddBookmarkWindowOnSave')}"
             />
             <i class="form-icon"></i>
             <span
@@ -282,66 +264,74 @@ export class Options extends LitElement {
           </div>
         </div>
 
-        ${this.closeAddBookmarkWindowOnSave
-          ? html`
-              <div class="form-group">
-                <label class="form-label" for="input-close-window-on-save-time"
-                  >Popup window close time delay after saving a bookmark<span
-                    class="text-error"
-                    >*</span
-                  ></label
-                >
-                <input
-                  class="form-input"
-                  type="number"
-                  id="input-close-window-on-save-time"
-                  .value="${this.closeAddBookmarkWindowOnSaveMs}"
-                  @input="${(e) =>
-                    this.handleInputChange(
-                      e,
-                      "closeAddBookmarkWindowOnSaveMs",
-                    )}"
-                />
-                <div class="form-input-hint">
-                  The time in milliseconds to wait before closing the bookmark
-                  popup window after saving a bookmark.
+        ${
+          this.closeAddBookmarkWindowOnSave
+            ? html`
+                <div class="form-group">
+                  <label
+                    class="form-label"
+                    for="input-close-window-on-save-time"
+                    >Popup window close time delay after saving a bookmark<span
+                      class="text-error"
+                      >*</span
+                    ></label
+                  >
+                  <input
+                    class="form-input"
+                    type="number"
+                    id="input-close-window-on-save-time"
+                    .value="${this.closeAddBookmarkWindowOnSaveMs}"
+                    @input="${(e) =>
+                      this.handleInputChange(
+                        e,
+                        'closeAddBookmarkWindowOnSaveMs',
+                      )}"
+                  />
+                  <div class="form-input-hint">
+                    The time in milliseconds to wait before closing the bookmark
+                    popup window after saving a bookmark.
+                  </div>
                 </div>
-              </div>
-            `
-          : ""}
+              `
+            : ''
+        }
 
         <div class="button-row">
-          ${this.isSuccess
-            ? html`
-                <div class="status text-success mr-2">
-                  ${icons.success()}
-                  <span>Connection successful</span>
-                </div>
-              `
-            : ""}
-          ${this.isError
-            ? html`
-                <div class="status text-error mr-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                    <path d="M12 9v4" />
-                    <path d="M12 16v.01" />
-                  </svg>
-                  <span>Connection failed</span>
-                </div>
-              `
-            : ""}
+          ${
+            this.isSuccess
+              ? html`
+                  <div class="status text-success mr-2">
+                    ${icons.success()}
+                    <span>Connection successful</span>
+                  </div>
+                `
+              : ''
+          }
+          ${
+            this.isError
+              ? html`
+                  <div class="status text-error mr-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                      <path d="M12 9v4" />
+                      <path d="M12 16v.01" />
+                    </svg>
+                    <span>Connection failed</span>
+                  </div>
+                `
+              : ''
+          }
           <button
             type="submit"
             class="btn btn-primary btn-wide ml-2"
@@ -355,4 +345,6 @@ export class Options extends LitElement {
   }
 }
 
-customElements.define("ld-options", Options);
+customElements.define('ld-options', Options);
+
+export { Options };

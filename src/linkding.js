@@ -1,8 +1,17 @@
-export class LinkdingApi {
+/** @typedef {import('./types').Configuration} Configuration */
+/** @typedef {import('./types').Profile} Profile */
+/** @typedef {import('./types').SaveBookmarkOptions} SaveBookmarkOptions */
+/** @typedef {import('./types').SearchOptions} SearchOptions */
+/** @typedef {import('./types').ServerBookmark} ServerBookmark */
+/** @typedef {import('./types').ServerMetadata} ServerMetadata */
+
+class LinkdingApi {
+  /** @param {Configuration} configuration */
   constructor(configuration) {
     this.configuration = configuration;
   }
 
+  /** @param {number} bookmarkId */
   async getBookmark(bookmarkId) {
     const configuration = this.configuration;
 
@@ -12,7 +21,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return /** @type {Promise<ServerBookmark>} */ (response.json());
       }
       return Promise.reject(
         `Error retrieving bookmark: ${response.statusText}`,
@@ -20,19 +29,22 @@ export class LinkdingApi {
     });
   }
 
-  async saveBookmark(bookmark, options = {}) {
+  async saveBookmark(
+    bookmark,
+    /** @type {SaveBookmarkOptions} */ options = {},
+  ) {
     const configuration = this.configuration;
-    const query = ["disable_scraping"];
+    const query = ['disable_scraping'];
     if (options.disable_html_snapshot) {
-      query.push("disable_html_snapshot");
+      query.push('disable_html_snapshot');
     }
-    const queryString = query.join("&");
+    const queryString = query.join('&');
 
     return fetch(`${configuration.baseUrl}/api/bookmarks/?${queryString}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Token ${configuration.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(bookmark),
     }).then((response) => {
@@ -54,10 +66,10 @@ export class LinkdingApi {
     const configuration = this.configuration;
 
     return fetch(`${configuration.baseUrl}/api/bookmarks/${bookmarkId}/`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         Authorization: `Token ${configuration.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     }).then((response) => {
       if (response.status !== 204) {
@@ -81,26 +93,33 @@ export class LinkdingApi {
     });
   }
 
+  /**
+   * @param {string} text
+   * @param {SearchOptions} options
+   */
   async search(text, options) {
     const configuration = this.configuration;
     const q = encodeURIComponent(text);
     const limit = options.limit || 100;
 
-    return fetch(
+    const response = await fetch(
       `${configuration.baseUrl}/api/bookmarks/?q=${q}&limit=${limit}`,
       {
         headers: {
           Authorization: `Token ${configuration.token}`,
         },
       },
-    ).then((response) => {
-      if (response.status === 200) {
-        return response.json().then((body) => body.results);
-      }
-      return Promise.reject(
-        `Error searching bookmarks: ${response.statusText}`,
-      );
-    });
+    );
+
+    if (response.status !== 200) {
+      throw new Error(`Error searching bookmarks: ${response.statusText}`);
+    }
+
+    const body = /** @type {{ results: ServerBookmark[] }} */ (
+      await response.json()
+    );
+
+    return body.results;
   }
 
   async check(url) {
@@ -113,7 +132,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return /** @type {Promise<ServerMetadata>} */ (response.json());
       }
       return Promise.reject(
         `Error checking bookmark URL: ${response.statusText}`,
@@ -130,7 +149,7 @@ export class LinkdingApi {
       },
     }).then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return /** @type {Promise<Profile>} */ (response.json());
       }
       return Promise.reject(
         `Error retrieving user profile: ${response.statusText}`,
@@ -152,3 +171,5 @@ export class LinkdingApi {
       .catch(() => false);
   }
 }
+
+export { LinkdingApi };

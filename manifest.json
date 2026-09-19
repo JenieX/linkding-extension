@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "linkding extension",
   "version": "1.15.1",
   "description": "Companion extension for the linkding bookmark service",
@@ -12,14 +12,15 @@
   },
 
   "background": {
-    "scripts": ["build/background.js"]
+    "service_worker": "src/background.js",
+    "type": "module"
   },
 
   "omnibox": {
     "keyword": "ld"
   },
 
-  "browser_action": {
+  "action": {
     "default_icon": {
       "19": "icons/button_19x19.png",
       "32": "icons/button_32x32.png",
@@ -30,7 +31,7 @@
   },
 
   "commands": {
-    "_execute_browser_action": {
+    "_execute_browser": {
       "suggested_key": {
         "default": "Alt+Shift+L"
       },
@@ -45,7 +46,10 @@
   "permissions": [
     "tabs",
     "storage",
-    "contextMenus",
+    "scripting"
+  ],
+
+  "host_permissions": [
     "http://*/*",
     "https://*/*"
   ]

@@ -1,0 +1,27 @@
+{
+  "files.exclude": {
+    ".cspell": true,
+    "docs": true,
+    "icons": true,
+    "libs": true,
+    "node_modules": true,
+
+    "LICENSE.txt": true,
+    "build.sh": true
+  },
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": ".gitignore, tsconfig.json, pnpm-lock.yaml, .prettierrc.json, .prettierignore"
+  },
+
+  "cSpell.customDictionaries": {
+    "custom-dictionary-workspace": {
+      "name": "custom-dictionary-workspace",
+      "path": "${workspaceFolder:linkding-extension}/.cspell/custom-dictionary-workspace.txt",
+      "addWords": true,
+      "scope": "workspace"
+    }
+  }
+}

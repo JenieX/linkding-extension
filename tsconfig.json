@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* Language and environment */
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    /* Type checking */
+    "strict": true,
+    "noImplicitAny": false,
+    "noUncheckedIndexedAccess": true,
+    "checkJs": true,
+
+    /* Modules */
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+
+    /* Code quality */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* Emit */
+    "noEmit": true,
+    "removeComments": false
+  },
+  "include": [
+    "./node_modules/@jeniex/utils/browser/index.d.ts",
+    "src"
+  ]
+}

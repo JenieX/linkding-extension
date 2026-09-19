@@ -1,10 +1,12 @@
-import { getStorageItem, setStorageItem } from "./browser";
-import { getConfiguration, isConfigurationComplete } from "./configuration";
-import { LinkdingApi } from "./linkding";
+import { getStorageItem, setStorageItem } from './browser.js';
+import { getConfiguration, isConfigurationComplete } from './configuration.js';
+import { LinkdingApi } from './linkding.js';
 
-const PROFILE_CACHE_KEY = "ld_profile_cache";
+/** @typedef {import('./types').Profile} Profile */
 
-export async function updateProfile() {
+const PROFILE_CACHE_KEY = 'ld_profile_cache';
+
+async function updateProfile() {
   const configuration = await getConfiguration();
   const hasCompleteConfiguration = isConfigurationComplete(configuration);
 
@@ -25,12 +27,18 @@ export async function updateProfile() {
   }
 }
 
-export async function getProfile() {
-  const json = await getStorageItem(PROFILE_CACHE_KEY);
-  return json ? JSON.parse(json) : null;
+async function getProfile() {
+  const jsonString = /** @type {string} */ (
+    await getStorageItem(PROFILE_CACHE_KEY)
+  );
+
+  return jsonString ? /** @type {Profile} */ (JSON.parse(jsonString)) : null;
 }
 
-export async function cacheProfile(profile) {
+/** @param {Profile} profile */
+async function cacheProfile(profile) {
   const json = JSON.stringify(profile);
   await setStorageItem(PROFILE_CACHE_KEY, json);
 }
+
+export { cacheProfile, getProfile, updateProfile };

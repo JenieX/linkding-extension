@@ -1,20 +1,25 @@
-import { LitElement, html, nothing } from "lit";
-import "./tag-autocomplete.js";
+import { LitElement, html, nothing } from '../libs/lit-core.min.js';
+import { asserted } from '../node_modules/@jeniex/utils/browser/index.js';
+import './tag-autocomplete.js';
 import {
+  createTab,
   getBrowserMetadata,
   getCurrentTabInfo,
   openOptions,
-  showBadge,
   runSinglefile,
-  removeBadge,
-  createTab,
-} from "./browser.js";
-import { loadServerMetadata, clearCachedServerMetadata } from "./cache.js";
-import { getProfile, updateProfile } from "./profile.js";
-import { getConfiguration } from "./configuration.js";
-import { icons } from "./icons";
+} from './browser.js';
+import { getConfiguration } from './configuration.js';
+import { getProfile, updateProfile } from './profile.js';
+import { icons } from './icons.js';
+import { loadServerMetadata } from './cache.js';
 
-export class PopupForm extends LitElement {
+/** @typedef {import('./types').Bookmark} Bookmark */
+/** @typedef {import('./types').Configuration} Configuration */
+/** @typedef {import('./types').Profile} Profile */
+/** @typedef {import('./types').ServerBookmark} ServerBookmark */
+/** @typedef {import('./types').TabInfo} TabInfo */
+
+class PopupForm extends LitElement {
   static properties = {
     api: { type: Object },
     configuration: { type: Object },
@@ -44,18 +49,18 @@ export class PopupForm extends LitElement {
     super();
     this.api = null;
     this.configuration = null;
-    this.url = "";
-    this.title = "";
-    this.titlePlaceholder = "";
-    this.descriptionPlaceholder = "";
-    this.description = "";
-    this.notes = "";
-    this.tags = "";
-    this.autoTags = "";
+    this.url = '';
+    this.title = '';
+    this.titlePlaceholder = '';
+    this.descriptionPlaceholder = '';
+    this.description = '';
+    this.notes = '';
+    this.tags = '';
+    this.autoTags = '';
     this.unread = false;
     this.shared = false;
-    this.saveState = "";
-    this.errorMessage = "";
+    this.saveState = '';
+    this.errorMessage = '';
     this.availableTagNames = [];
     this.existingBookmark = null;
     this.editNotes = false;
@@ -70,16 +75,16 @@ export class PopupForm extends LitElement {
     return this;
   }
 
-  firstUpdated(props) {
-    super.firstUpdated(props);
+  firstUpdated(changedProperties) {
+    super.firstUpdated(changedProperties);
 
-    this.classList.add("bookmark-form");
+    this.classList.add('bookmark-form');
   }
 
   updated(changedProperties) {
     if (
-      changedProperties.has("api") ||
-      changedProperties.has("configuration")
+      changedProperties.has('api') ||
+      changedProperties.has('configuration')
     ) {
       if (this.api && this.configuration) {
         this.init();
@@ -117,7 +122,7 @@ export class PopupForm extends LitElement {
 
     const [serverMetadata, browserMetadata] = await Promise.all([
       loadServerMetadata(this.url),
-      getBrowserMetadata(this.url),
+      getBrowserMetadata(),
     ]);
 
     this.loading = false;
@@ -126,14 +131,13 @@ export class PopupForm extends LitElement {
       this.title = browserMetadata.title;
       this.description = browserMetadata.description;
     } else {
-      this.title = serverMetadata.metadata.title;
-      this.description = serverMetadata.metadata.description;
+      this.title = asserted(serverMetadata).metadata.title;
+      this.description = asserted(serverMetadata).metadata.description;
     }
 
     this.shared = this.configuration.shareSelected;
     this.unread = this.configuration.unreadSelected;
 
-    // If the bookmark already exists, prefill the form with the existing bookmark
     if (!serverMetadata) {
       return;
     }
@@ -143,33 +147,37 @@ export class PopupForm extends LitElement {
       this.existingBookmark = existingBookmark;
       this.title = existingBookmark.title;
       this.tags = existingBookmark.tag_names
-        ? existingBookmark.tag_names.join(" ")
-        : "";
+        ? existingBookmark.tag_names.join(' ')
+        : '';
       this.description = existingBookmark.description;
       this.notes = existingBookmark.notes;
       this.unread = existingBookmark.unread;
       this.shared = existingBookmark.shared;
-      this.autoTags = "";
+      this.autoTags = '';
     } else {
       // Only show auto tags for new bookmarks
       // Auto tags are only supported since v1.31.0, so we need to check if they are available
       const autoTagsList = serverMetadata.auto_tags;
       if (autoTagsList) {
-        this.autoTags = autoTagsList.join(" ");
+        this.autoTags = autoTagsList.join(' ');
       }
     }
   }
 
-  async handleSubmit(e) {
-    e.preventDefault();
+  /** @param {SubmitEvent} event */
+  async handleSubmit(event) {
+    event.preventDefault();
+
     const tagNames = this.tags
-      .split(" ")
+      .split(' ')
       .map((tag) => tag.trim())
       .filter((tag) => !!tag);
+
+    /** @type {Bookmark} */
     const bookmark = {
       url: this.url,
-      title: this.title || "",
-      description: this.description || "",
+      title: this.title || '',
+      description: this.description || '',
       notes: this.notes,
       tag_names: tagNames,
       unread: this.unread,
@@ -177,26 +185,19 @@ export class PopupForm extends LitElement {
     };
 
     try {
-      this.saveState = "loading";
+      this.saveState = 'loading';
 
       await this.api.saveBookmark(bookmark, {
         disable_html_snapshot: this.extensionConfiguration?.runSinglefile,
       });
-      await clearCachedServerMetadata();
 
-      this.saveState = "success";
-
-      // Show star badge on the tab to indicate that it's now bookmarked
-      // but only if precaching is enabled, since the badge will never
-      // show when browsing without precaching
-      if (this.extensionConfiguration?.precacheEnabled) {
-        showBadge(this.tabInfo.id);
-      }
+      this.saveState = 'success';
 
       // Close popup window after saving the bookmark, if configured
       if (
         this.extensionConfiguration?.closeAddBookmarkWindowOnSave === true &&
-        this.extensionConfiguration?.closeAddBookmarkWindowOnSaveMs >= 0
+        asserted(this.extensionConfiguration?.closeAddBookmarkWindowOnSaveMs) >=
+          0
       ) {
         window.setTimeout(() => {
           window.close();
@@ -210,9 +211,9 @@ export class PopupForm extends LitElement {
       ) {
         runSinglefile();
       }
-    } catch (e) {
-      this.saveState = "error";
-      this.errorMessage = e.toString();
+    } catch (error) {
+      this.saveState = 'error';
+      this.errorMessage = /** @type {Error} */ (error).message;
       console.error(this.errorMessage);
     }
   }
@@ -232,12 +233,10 @@ export class PopupForm extends LitElement {
 
     try {
       await this.api.deleteBookmark(this.existingBookmark.id);
-      await clearCachedServerMetadata();
-      removeBadge(this.tabInfo.id);
       window.close();
-    } catch (e) {
-      this.saveState = "error";
-      this.errorMessage = e.toString();
+    } catch (error) {
+      this.saveState = 'error';
+      this.errorMessage = /** @type {Error} */ (error).message;
       console.error(this.errorMessage);
     }
   }
@@ -263,14 +262,14 @@ export class PopupForm extends LitElement {
 
   handleInputChange(e, property) {
     this[property] =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   }
 
   render() {
     return html`
       <div class="title-row">
         <h1 class="h6">
-          ${this.existingBookmark ? "Edit Bookmark" : "Add bookmark"}
+          ${this.existingBookmark ? 'Edit Bookmark' : 'Add bookmark'}
         </h1>
         ${this.renderHeaderActions()}
       </div>
@@ -284,19 +283,21 @@ export class PopupForm extends LitElement {
               id="input-url"
               placeholder="URL"
               .value="${this.url}"
-              @input="${(e) => this.handleInputChange(e, "url")}"
+              @input="${(e) => this.handleInputChange(e, 'url')}"
             />
-            ${this.loading ? html`<i class="form-icon loading"></i>` : ""}
+            ${this.loading ? html`<i class="form-icon loading"></i>` : ''}
           </div>
-          ${this.existingBookmark
-            ? html`
-                <div class="form-input-hint text-warning">
-                  This URL is already bookmarked. The form has been prefilled
-                  from the existing bookmark, and saving the form will update
-                  the existing bookmark.
-                </div>
-              `
-            : ""}
+          ${
+            this.existingBookmark
+              ? html`
+                  <div class="form-input-hint text-warning">
+                    This URL is already bookmarked. The form has been prefilled
+                    from the existing bookmark, and saving the form will update
+                    the existing bookmark.
+                  </div>
+                `
+              : ''
+          }
         </div>
         <div class="form-group">
           <label class="form-label" for="input-tags">Tags</label>
@@ -307,13 +308,15 @@ export class PopupForm extends LitElement {
             .tags="${this.availableTagNames}"
             @value-change="${this.handleTagsChange}"
           ></ld-tag-autocomplete>
-          ${this.autoTags
-            ? html`
-                <div class="form-input-hint text-success">
-                  Auto tags: ${this.autoTags}
-                </div>
-              `
-            : ""}
+          ${
+            this.autoTags
+              ? html`
+                  <div class="form-input-hint text-success">
+                    Auto tags: ${this.autoTags}
+                  </div>
+                `
+              : ''
+          }
         </div>
         <div class="form-group">
           <label class="form-label" for="input-title">Title</label>
@@ -323,126 +326,140 @@ export class PopupForm extends LitElement {
             id="input-title"
             .value="${this.title}"
             placeholder="${this.titlePlaceholder}"
-            @input="${(e) => this.handleInputChange(e, "title")}"
+            @input="${(e) => this.handleInputChange(e, 'title')}"
           />
         </div>
         <div class="form-group">
-          ${!this.editNotes
-            ? html`
-                <div class="form-label-row">
-                  <label class="form-label" for="input-description"
-                    >Description</label
-                  >
-                  <button
-                    type="button"
-                    class="btn btn-link"
-                    @click="${(e) => {
-                      e.preventDefault();
-                      this.toggleNotes();
-                    }}"
-                  >
-                    Edit notes
-                  </button>
-                </div>
-                <textarea
-                  class="form-input"
-                  id="input-description"
-                  .value="${this.description}"
-                  placeholder="${this.descriptionPlaceholder}"
-                  @input="${(e) => this.handleInputChange(e, "description")}"
-                ></textarea>
-              `
-            : ""}
-          ${this.editNotes
-            ? html`
-                <div class="form-label-row">
-                  <label class="form-label" for="input-notes">Notes</label>
-                  <button
-                    type="button"
-                    class="btn btn-link"
-                    @click="${(e) => {
-                      e.preventDefault();
-                      this.toggleNotes();
-                    }}"
-                  >
-                    Edit description
-                  </button>
-                </div>
-                <textarea
-                  class="form-input"
-                  id="input-notes"
-                  rows="5"
-                  .value="${this.notes}"
-                  @input="${(e) => this.handleInputChange(e, "notes")}"
-                ></textarea>
-              `
-            : ""}
+          ${
+            !this.editNotes
+              ? html`
+                  <div class="form-label-row">
+                    <label class="form-label" for="input-description"
+                      >Description</label
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-link"
+                      @click="${(e) => {
+                        e.preventDefault();
+                        this.toggleNotes();
+                      }}"
+                    >
+                      Edit notes
+                    </button>
+                  </div>
+                  <textarea
+                    class="form-input"
+                    id="input-description"
+                    .value="${this.description}"
+                    placeholder="${this.descriptionPlaceholder}"
+                    @input="${(e) => this.handleInputChange(e, 'description')}"
+                  ></textarea>
+                `
+              : ''
+          }
+          ${
+            this.editNotes
+              ? html`
+                  <div class="form-label-row">
+                    <label class="form-label" for="input-notes">Notes</label>
+                    <button
+                      type="button"
+                      class="btn btn-link"
+                      @click="${(e) => {
+                        e.preventDefault();
+                        this.toggleNotes();
+                      }}"
+                    >
+                      Edit description
+                    </button>
+                  </div>
+                  <textarea
+                    class="form-input"
+                    id="input-notes"
+                    rows="5"
+                    .value="${this.notes}"
+                    @input="${(e) => this.handleInputChange(e, 'notes')}"
+                  ></textarea>
+                `
+              : ''
+          }
         </div>
         <div class="form-group d-flex">
           <label class="form-checkbox">
             <input
               type="checkbox"
               .checked="${this.unread}"
-              @change="${(e) => this.handleInputChange(e, "unread")}"
+              @change="${(e) => this.handleInputChange(e, 'unread')}"
             />
             <i class="form-icon"></i>
             <span>Mark as unread</span>
           </label>
-          ${this.profile?.enable_sharing
-            ? html`
-                <label class="form-checkbox ml-4">
-                  <input
-                    type="checkbox"
-                    .checked="${this.shared}"
-                    @change="${(e) => this.handleInputChange(e, "shared")}"
-                  />
-                  <i class="form-icon"></i>
-                  <span>Share</span>
-                </label>
-              `
-            : ""}
+          ${
+            this.profile?.enable_sharing
+              ? html`
+                  <label class="form-checkbox ml-4">
+                    <input
+                      type="checkbox"
+                      .checked="${this.shared}"
+                      @change="${(e) => this.handleInputChange(e, 'shared')}"
+                    />
+                    <i class="form-icon"></i>
+                    <span>Share</span>
+                  </label>
+                `
+              : ''
+          }
         </div>
         <div class="footer">
-          ${this.saveState === "success"
-            ? html`
-                <div class="result-row text-success">
-                  ${icons.success()}
-                  <span>Bookmark saved</span>
-                </div>
-              `
-            : ""}
-          ${this.saveState === "error"
-            ? html`
-                <div class="result-row text-error">
-                  Error saving bookmark: ${this.errorMessage}
-                </div>
-              `
-            : ""}
-          ${this.saveState !== "success"
-            ? html`
-                <div class="button-row">
-                  ${this.existingBookmark
-                    ? html`
-                        <button
-                          type="button"
-                          class="btn btn-error"
-                          aria-label="Delete bookmark"
-                          @click="${this.showDeleteConfirmation}"
-                        >
-                          ${icons.delete()}
-                        </button>
-                      `
-                    : nothing}
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-wide ml-auto ${this.saveState}"
-                    ?disabled="${this.saveState === "loading"}"
-                  >
-                    Save
-                  </button>
-                </div>
-              `
-            : ""}
+          ${
+            this.saveState === 'success'
+              ? html`
+                  <div class="result-row text-success">
+                    ${icons.success()}
+                    <span>Bookmark saved</span>
+                  </div>
+                `
+              : ''
+          }
+          ${
+            this.saveState === 'error'
+              ? html`
+                  <div class="result-row text-error">
+                    Error saving bookmark: ${this.errorMessage}
+                  </div>
+                `
+              : ''
+          }
+          ${
+            this.saveState !== 'success'
+              ? html`
+                  <div class="button-row">
+                    ${
+                      this.existingBookmark
+                        ? html`
+                            <button
+                              type="button"
+                              class="btn btn-error"
+                              aria-label="Delete bookmark"
+                              @click="${this.showDeleteConfirmation}"
+                            >
+                              ${icons.delete()}
+                            </button>
+                          `
+                        : nothing
+                    }
+                    <button
+                      type="submit"
+                      class="btn btn-primary btn-wide ml-auto ${this.saveState}"
+                      ?disabled="${this.saveState === 'loading'}"
+                    >
+                      Save
+                    </button>
+                  </div>
+                `
+              : ''
+          }
         </div>
       </form>
 
@@ -502,4 +519,6 @@ export class PopupForm extends LitElement {
   }
 }
 
-customElements.define("ld-popup-form", PopupForm);
+customElements.define('ld-popup-form', PopupForm);
+
+export { PopupForm };

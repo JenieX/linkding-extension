@@ -1,31 +1,41 @@
-import { getStorageItem, setStorageItem } from "./browser";
+import { getStorageItem, setStorageItem } from './browser.js';
 
-const CONFIG_KEY = "ld_ext_config";
+/** @typedef {import('./types').Configuration} Configuration */
+
+const CONFIG_KEY = 'ld_ext_config';
+
+/** @type {Configuration} */
 const DEFAULTS = {
-  baseUrl: "",
-  token: "",
-  default_tags: "",
+  baseUrl: '',
+  token: '',
+  default_tags: '',
   useBrowserMetadata: false,
   runSinglefile: false,
-  precacheEnabled: false,
   closeAddBookmarkWindowOnSave: false,
   closeAddBookmarkWindowOnSaveMs: 500,
 };
 
-export async function getConfiguration() {
-  const configJson = await getStorageItem(CONFIG_KEY);
-  const config = configJson ? JSON.parse(configJson) : {};
+/** @returns {Promise<Configuration>} */
+async function getConfiguration() {
+  const configString = /** @type {string} */ (await getStorageItem(CONFIG_KEY));
+  const config = configString
+    ? /** @type {Configuration} */
+      (JSON.parse(configString))
+    : {};
+
   return {
     ...DEFAULTS,
     ...config,
   };
 }
 
-export async function saveConfiguration(config) {
+async function saveConfiguration(config) {
   const configJson = JSON.stringify(config);
   await setStorageItem(CONFIG_KEY, configJson);
 }
 
-export function isConfigurationComplete(config) {
+function isConfigurationComplete(config) {
   return config.baseUrl && config.token;
 }
+
+export { getConfiguration, isConfigurationComplete, saveConfiguration };

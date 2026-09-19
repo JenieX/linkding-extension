@@ -1,17 +1,15 @@
-import {
-  getBrowser,
-  getCurrentTabInfo,
-  showBadge,
-  removeBadge,
-  showSuccessBadge,
-} from "./browser";
-import { loadServerMetadata } from "./cache";
-import { getConfiguration, isConfigurationComplete } from "./configuration";
-import { LinkdingApi } from "./linkding";
+import { LinkdingApi } from './linkding.js';
+import { getConfiguration, isConfigurationComplete } from './configuration.js';
+import { getCurrentTabInfo } from './browser.js';
 
-const browser = getBrowser();
-let api = null;
-let configuration = null;
+/** @typedef {import('./types').Configuration} Configuration */
+
+/** @type {LinkdingApi} */
+let api;
+
+/** @type {Configuration} */
+let configuration;
+
 let hasCompleteConfiguration = false;
 
 async function initApi() {
@@ -24,41 +22,27 @@ async function initApi() {
 
   if (hasCompleteConfiguration) {
     api = new LinkdingApi(configuration);
-  } else {
-    api = null;
   }
 
-  return api !== null;
+  return api !== undefined;
 }
 
-/* Dynamic badge */
-async function setDynamicBadge(tabId, tabMetadata) {
-  // Set badge if tab is bookmarked
-  if (tabMetadata?.bookmark) {
-    showBadge(tabId);
-  } else {
-    removeBadge(tabId);
-  }
-}
-
-/* Omnibox / Search integration */
-
-browser.omnibox.onInputStarted.addListener(async () => {
+chrome.omnibox.onInputStarted.addListener(async () => {
   const isReady = await initApi();
   const description = isReady
-    ? "Search bookmarks in linkding"
-    : "⚠️ Please configure the linkding extension first";
+    ? 'Search bookmarks in linkding'
+    : '⚠️ Please configure the linkding extension first';
 
-  browser.omnibox.setDefaultSuggestion({ description });
+  chrome.omnibox.setDefaultSuggestion({ description });
 });
 
-browser.omnibox.onInputChanged.addListener((text, suggest) => {
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   if (!api) {
     return;
   }
 
   api
-    .search(text, { limit: 5 })
+    .search(text, { limit: 9 })
     .then((results) => {
       const bookmarkSuggestions = results.map((bookmark) => ({
         content: bookmark.url,
@@ -71,7 +55,7 @@ browser.omnibox.onInputChanged.addListener((text, suggest) => {
     });
 });
 
-browser.omnibox.onInputEntered.addListener(async (content, disposition) => {
+chrome.omnibox.onInputEntered.addListener(async (content, disposition) => {
   if (!hasCompleteConfiguration || !content) {
     return;
   }
@@ -84,99 +68,22 @@ browser.omnibox.onInputEntered.addListener(async (content, disposition) => {
   // Edge doesn't allow updating the New Tab Page (tested with version 117).
   // Trying to do so will throw: "Error: Cannot update NTP tab."
   // As a workaround, open a new tab instead.
-  if (disposition === "currentTab") {
+  if (disposition === 'currentTab') {
     const tabInfo = await getCurrentTabInfo();
-    if (tabInfo.url === "edge://newtab/") {
-      disposition = "newForegroundTab";
+    if (tabInfo.url === 'edge://newtab/') {
+      disposition = 'newForegroundTab';
     }
   }
 
   switch (disposition) {
-    case "currentTab":
-      browser.tabs.update({ url });
+    case 'currentTab':
+      chrome.tabs.update({ url });
       break;
-    case "newForegroundTab":
-      browser.tabs.create({ url });
+    case 'newForegroundTab':
+      chrome.tabs.create({ url });
       break;
-    case "newBackgroundTab":
-      browser.tabs.create({ url, active: false });
+    case 'newBackgroundTab':
+      chrome.tabs.create({ url, active: false });
       break;
   }
 });
-
-/* Precache bookmark / website metadata when tab or URL changes */
-
-browser.tabs.onActivated.addListener(async (activeInfo) => {
-  const tabInfo = await getCurrentTabInfo();
-  let tabMetadata = await loadServerMetadata(tabInfo.url, true);
-  setDynamicBadge(activeInfo.tabId, tabMetadata);
-});
-
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // Only interested in URL changes
-  // Ignore URL changes in non-active tabs
-  if (!changeInfo.url || !tab.active) {
-    return;
-  }
-
-  let tabMetadata = await loadServerMetadata(tab.url, true);
-  setDynamicBadge(tabId, tabMetadata);
-});
-
-/* Context Menu */
-
-browser.runtime.onInstalled.addListener(() => {
-  browser.contextMenus.create({
-    id: "save-to-linkding",
-    title: "Save to linkding",
-    contexts: ["link"],
-  });
-});
-
-browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "save-to-linkding") {
-    await saveToLinkding(info.linkUrl, tab);
-  }
-});
-
-async function saveToLinkding(url) {
-  const isReady = await initApi();
-  if (!isReady) {
-    return;
-  }
-
-  try {
-    const serverMetadata = await loadServerMetadata(url, false);
-    const title = serverMetadata.metadata.title ?? "";
-    const description = serverMetadata.metadata.description ?? "";
-    const tagNames = configuration.default_tags
-      ? configuration.default_tags
-          .split(" ")
-          .map((tag) => tag.trim())
-          .filter((tag) => !!tag)
-      : [];
-    const unread = configuration.unreadSelected ?? false;
-    const shared = configuration.shareSelected ?? false;
-
-    const bookmark = {
-      url,
-      title,
-      description,
-      tag_names: tagNames,
-      unread,
-      shared,
-    };
-
-    await api.saveBookmark(bookmark);
-
-    // Show success badge temporarily
-    const currentTab = await getCurrentTabInfo();
-    showSuccessBadge(currentTab.id);
-    setTimeout(async () => {
-      const tabMetadata = await loadServerMetadata(currentTab.url, true);
-      setDynamicBadge(currentTab.id, tabMetadata);
-    }, 1000);
-  } catch (error) {
-    console.error("Error saving link to linkding:", error);
-  }
-}

@@ -1,29 +1,30 @@
 {
   "name": "linkding-extension",
   "version": "1.15.1",
+  "type": "module",
   "description": "Companion extension for the linkding bookmark service",
-  "license": "MIT",
-  "author": "Sascha Ißbrücker",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sissbruecker/linkding-extension.git"
   },
+  "homepage": "https://github.com/sissbruecker/linkding-extension#readme",
   "bugs": {
     "url": "https://github.com/sissbruecker/linkding-extension/issues"
   },
-  "homepage": "https://github.com/sissbruecker/linkding-extension#readme",
+  "author": "Sascha Ißbrücker",
+  "license": "MIT",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "format": "prettier --write \"src/**/*.js\""
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "lit": "^3.3.1"
+    "@jeniex/utils": "^1.4.1"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-terser": "^0.4.4",
-    "prettier": "^3.6.2",
-    "rollup": "^4.49.0"
+    "@types/chrome": "^0.2.9",
+    "@types/node": "^26.5.1",
+    "lit": "^3.3.3",
+    "prettier": "^3.9.6",
+    "prettier-plugin-jsdoc": "^1.8.1",
+    "prettier-plugin-pkg": "^0.22.1"
   }
 }
