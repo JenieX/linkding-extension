@@ -22,6 +22,7 @@ class Options extends LitElement {
 
   constructor() {
     super();
+
     this.baseUrl = '';
     this.token = '';
     this.default_tags = '';
@@ -280,7 +281,7 @@ class Options extends LitElement {
                     class="form-input"
                     type="number"
                     id="input-close-window-on-save-time"
-                    .value="${this.closeAddBookmarkWindowOnSaveMs}"
+                    .value="${this.closeAddBookmarkWindowOnSaveMs.toString()}"
                     @input="${(e) =>
                       this.handleInputChange(
                         e,

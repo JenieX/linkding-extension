@@ -2,6 +2,10 @@ import { LitElement, html } from '../libs/lit-core.min.js';
 import { asserted } from '../node_modules/@jeniex/utils/browser/index.js';
 import { getCurrentWord, getCurrentWordBounds } from './util.js';
 
+/**
+ * @property {string} value
+ * @property {string[]} tags
+ */
 class TagAutocomplete extends LitElement {
   static properties = {
     inputId: { type: String },
@@ -74,8 +78,6 @@ class TagAutocomplete extends LitElement {
 
   /** @param {KeyboardEvent} event */
   handleKeyDown(event) {
-    console.log(event.keyCode);
-
     if (this.isOpen && (event.key === 'Enter' || event.key === 'Tab')) {
       const suggestion = this.suggestions[this.selectedIndex];
       this.complete(suggestion);

@@ -21,7 +21,18 @@
 
     /* Emit */
     "noEmit": true,
-    "removeComments": false
+    "removeComments": false,
+
+    "plugins": [
+      {
+        "name": "ts-lit-plugin",
+        "strict": true
+        // "rules": {
+        // "no-incompatible-type-binding": "off"
+        //   "no-unknown-event": "warn"
+        // }
+      }
+    ]
   },
   "include": [
     "./node_modules/@jeniex/utils/browser/index.d.ts",

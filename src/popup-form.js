@@ -12,6 +12,7 @@ import { getConfiguration } from './configuration.js';
 import { getProfile, updateProfile } from './profile.js';
 import { icons } from './icons.js';
 import { loadServerMetadata } from './cache.js';
+import { LinkdingApi } from './linkding.js';
 
 /** @typedef {import('./types').Bookmark} Bookmark */
 /** @typedef {import('./types').Configuration} Configuration */
@@ -47,8 +48,13 @@ class PopupForm extends LitElement {
 
   constructor() {
     super();
+
+    /** @type {LinkdingApi | null} */
     this.api = null;
+
+    /** @type {Configuration | null} */
     this.configuration = null;
+
     this.url = '';
     this.title = '';
     this.titlePlaceholder = '';
@@ -61,7 +67,10 @@ class PopupForm extends LitElement {
     this.shared = false;
     this.saveState = '';
     this.errorMessage = '';
+
+    /** @type {string[]} */
     this.availableTagNames = [];
+
     this.existingBookmark = null;
     this.editNotes = false;
     this.profile = null;
@@ -93,23 +102,13 @@ class PopupForm extends LitElement {
   }
 
   async init() {
-    // First get cached user profile to quickly show something, then update it
-    // in the background
     this.profile = await getProfile();
-    updateProfile().then((updatedProfile) => {
-      this.profile = updatedProfile;
-    });
+    this.profile = await updateProfile();
+    this.tags = asserted(this.configuration?.default_tags);
 
-    // Load available tags in the background
-    this.tags = this.configuration.default_tags;
-    this.api
-      .getTags()
-      .catch(() => [])
-      .then((tags) => {
-        this.availableTagNames = tags.map((tag) => tag.name);
-      });
+    const availableTags = await asserted(this.api).getTags();
+    this.availableTagNames = availableTags.map((tag) => tag.name);
 
-    // Initialize bookmark form
     await this.initForm();
     this.extensionConfiguration = await getConfiguration();
   }
@@ -127,7 +126,7 @@ class PopupForm extends LitElement {
 
     this.loading = false;
 
-    if (this.configuration.useBrowserMetadata) {
+    if (asserted(this.configuration).useBrowserMetadata) {
       this.title = browserMetadata.title;
       this.description = browserMetadata.description;
     } else {
@@ -135,8 +134,8 @@ class PopupForm extends LitElement {
       this.description = asserted(serverMetadata).metadata.description;
     }
 
-    this.shared = this.configuration.shareSelected;
-    this.unread = this.configuration.unreadSelected;
+    this.shared = asserted(this.configuration?.shareSelected);
+    this.unread = asserted(this.configuration?.unreadSelected);
 
     if (!serverMetadata) {
       return;
@@ -187,7 +186,7 @@ class PopupForm extends LitElement {
     try {
       this.saveState = 'loading';
 
-      await this.api.saveBookmark(bookmark, {
+      await asserted(this.api).saveBookmark(bookmark, {
         disable_html_snapshot: this.extensionConfiguration?.runSinglefile,
       });
 
@@ -232,7 +231,7 @@ class PopupForm extends LitElement {
     }
 
     try {
-      await this.api.deleteBookmark(this.existingBookmark.id);
+      await asserted(this.api).deleteBookmark(this.existingBookmark.id);
       window.close();
     } catch (error) {
       this.saveState = 'error';
@@ -248,7 +247,7 @@ class PopupForm extends LitElement {
 
   handleOpenLinkding(e) {
     e.preventDefault();
-    createTab(this.configuration.baseUrl);
+    createTab(asserted(this.configuration).baseUrl);
     window.close();
   }
 

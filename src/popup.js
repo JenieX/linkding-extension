@@ -15,8 +15,13 @@ class Popup extends LitElement {
 
   constructor() {
     super();
+
     this.hasCompleteConfiguration = true;
+
+    /** @type {Configuration | null} */
     this.configuration = null;
+
+    /** @type {LinkdingApi | null} */
     this.api = null;
   }
 

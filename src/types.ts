@@ -14,6 +14,12 @@ interface SaveBookmarkOptions {
   disable_html_snapshot?: boolean;
 }
 
+interface Tag {
+  date_added: string;
+  id: number;
+  name: string;
+}
+
 interface ServerBookmark {
   date_added: string;
   date_modified: string;
@@ -89,4 +95,5 @@ export type {
   ServerBookmark,
   ServerMetadata,
   TabInfo,
+  Tag,
 };

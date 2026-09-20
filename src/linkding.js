@@ -4,6 +4,7 @@
 /** @typedef {import('./types').SearchOptions} SearchOptions */
 /** @typedef {import('./types').ServerBookmark} ServerBookmark */
 /** @typedef {import('./types').ServerMetadata} ServerMetadata */
+/** @typedef {import('./types').Tag} Tag */
 
 class LinkdingApi {
   /** @param {Configuration} configuration */
@@ -81,16 +82,22 @@ class LinkdingApi {
   async getTags() {
     const configuration = this.configuration;
 
-    return fetch(`${configuration.baseUrl}/api/tags/?limit=5000`, {
-      headers: {
-        Authorization: `Token ${configuration.token}`,
+    const response = await fetch(
+      `${configuration.baseUrl}/api/tags/?limit=5000`,
+      {
+        headers: {
+          Authorization: `Token ${configuration.token}`,
+        },
       },
-    }).then((response) => {
-      if (response.status === 200) {
-        return response.json().then((body) => body.results);
-      }
-      return Promise.reject(`Error loading tags: ${response.statusText}`);
-    });
+    );
+
+    if (response.status !== 200) {
+      throw new Error(`Error loading tags: ${response.statusText}`);
+    }
+
+    const body = /** @type {{ results: Tag[] }} */ (await response.json());
+
+    return body.results;
   }
 
   /**
