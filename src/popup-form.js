@@ -13,6 +13,7 @@ import { getProfile, updateProfile } from './profile.js';
 import { icons } from './icons.js';
 import { loadServerMetadata } from './cache.js';
 import { LinkdingApi } from './linkding.js';
+import { createTags } from './util.js';
 
 /** @typedef {import('./types').Bookmark} Bookmark */
 /** @typedef {import('./types').Configuration} Configuration */
@@ -123,6 +124,8 @@ class PopupForm extends LitElement {
       getBrowserMetadata(),
     ]);
 
+    // await sleep(1000);
+
     this.loading = false;
 
     if (asserted(this.configuration).useBrowserMetadata) {
@@ -153,6 +156,8 @@ class PopupForm extends LitElement {
       this.shared = existingBookmark.shared;
       this.autoTags = '';
     } else {
+      this.tags = await createTags();
+
       // Only show auto tags for new bookmarks
       // Auto tags are only supported since v1.31.0, so we need to check if they are available
       const autoTagsList = serverMetadata.auto_tags;

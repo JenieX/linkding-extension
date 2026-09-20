@@ -1,4 +1,6 @@
 {
+  "$schema": "file:///D:/projects/json-schemas/prettierrc.json",
+
   "arrowParens": "always",
   "bracketSameLine": false,
   "bracketSpacing": true,

@@ -1,4 +1,5 @@
 {
+  "$schema": "file:///D:/projects/json-schemas/package.json",
   "name": "linkding-extension",
   "version": "1.15.1",
   "type": "module",
@@ -17,7 +18,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@jeniex/utils": "^1.4.1"
+    "@jeniex/utils": "^1.4.1",
+    "tldts": "^7.4.13"
   },
   "devDependencies": {
     "@types/chrome": "^0.2.9",

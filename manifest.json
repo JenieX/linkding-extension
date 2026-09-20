@@ -1,4 +1,6 @@
 {
+  "$schema": "file:///D:/projects/json-schemas/chrome-manifest.json",
+
   "manifest_version": 3,
   "name": "linkding extension",
   "version": "1.15.1",

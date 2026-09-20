@@ -1,4 +1,6 @@
 {
+  "$schema": "file:///D:/projects/json-schemas/tsconfig.json",
+
   "compilerOptions": {
     /* Language and environment */
     "target": "esnext",
@@ -26,11 +28,10 @@
     "plugins": [
       {
         "name": "ts-lit-plugin",
-        "strict": true
-        // "rules": {
-        // "no-incompatible-type-binding": "off"
-        //   "no-unknown-event": "warn"
-        // }
+        "strict": true,
+        "rules": {
+          "no-unknown-attribute": "off"
+        }
       }
     ]
   },

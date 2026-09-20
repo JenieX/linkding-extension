@@ -1,4 +1,13 @@
 import { asserted } from '../node_modules/@jeniex/utils/browser/index.js';
+import { parse as tldtsParse } from '../libs/tldts.js';
+import { getCurrentTabInfo } from './browser.js';
+
+async function createTags() {
+  const { url } = await getCurrentTabInfo();
+  const { domainWithoutSuffix } = tldtsParse(url);
+
+  return domainWithoutSuffix ?? '';
+}
 
 /** @param {HTMLInputElement} input */
 function getCurrentWordBounds(input) {
@@ -23,4 +32,4 @@ function getCurrentWord(input) {
   return input.value.substring(bounds.start, bounds.end);
 }
 
-export { getCurrentWord, getCurrentWordBounds };
+export { createTags, getCurrentWordBounds, getCurrentWord };
