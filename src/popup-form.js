@@ -104,7 +104,6 @@ class PopupForm extends LitElement {
   async init() {
     this.profile = await getProfile();
     this.profile = await updateProfile();
-    this.tags = asserted(this.configuration?.default_tags);
 
     const availableTags = await asserted(this.api).getTags();
     this.availableTagNames = availableTags.map((tag) => tag.name);

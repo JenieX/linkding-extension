@@ -2,7 +2,6 @@ interface Configuration {
   baseUrl: string;
   closeAddBookmarkWindowOnSave?: boolean;
   closeAddBookmarkWindowOnSaveMs?: number;
-  default_tags?: string;
   runSinglefile?: boolean;
   shareSelected?: boolean;
   token: string;

@@ -25,7 +25,6 @@ class Options extends LitElement {
 
     this.baseUrl = '';
     this.token = '';
-    this.default_tags = '';
     this.unreadSelected = false;
     this.shareSelected = false;
     this.useBrowserMetadata = false;
@@ -51,7 +50,6 @@ class Options extends LitElement {
     const config = await getConfiguration();
     this.baseUrl = config.baseUrl;
     this.token = config.token;
-    this.default_tags = asserted(config.default_tags);
 
     if (config.unreadSelected !== undefined) {
       this.unreadSelected = config.unreadSelected;
@@ -76,7 +74,6 @@ class Options extends LitElement {
     const config = {
       baseUrl: this.baseUrl,
       token: this.token,
-      default_tags: this.default_tags,
       unreadSelected: this.unreadSelected,
       shareSelected: this.shareSelected,
       useBrowserMetadata: this.useBrowserMetadata,
@@ -131,6 +128,7 @@ class Options extends LitElement {
             path or a trailing slash
           </div>
         </div>
+
         <div class="form-group">
           <label class="form-label" for="input-token"
             >API Authentication Token <span class="text-error">*</span></label
@@ -146,22 +144,6 @@ class Options extends LitElement {
           <div class="form-input-hint">
             Used to authenticate against the linkding API. You can find this on
             your linkding settings page.
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="input-default-tags"
-            >Default Tags</label
-          >
-          <input
-            class="form-input"
-            type="text"
-            id="input-default-tags"
-            placeholder=""
-            .value="${this.default_tags}"
-            @input="${(e) => this.handleInputChange(e, 'default_tags')}"
-          />
-          <div class="form-input-hint">
-            Set of tags that should be added to new bookmarks by default.
           </div>
         </div>
 

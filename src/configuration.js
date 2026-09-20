@@ -8,7 +8,6 @@ const CONFIG_KEY = 'ld_ext_config';
 const DEFAULTS = {
   baseUrl: '',
   token: '',
-  default_tags: '',
   useBrowserMetadata: false,
   runSinglefile: false,
   closeAddBookmarkWindowOnSave: false,
