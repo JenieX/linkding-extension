@@ -146,7 +146,8 @@ class PopupForm extends LitElement {
     }
 
     const existingBookmark = serverMetadata.bookmark;
-    if (existingBookmark) {
+
+    if (existingBookmark !== null) {
       this.existingBookmark = existingBookmark;
       this.title = existingBookmark.title;
       this.tags = existingBookmark.tag_names
@@ -293,11 +294,16 @@ class PopupForm extends LitElement {
           ${
             this.existingBookmark
               ? html`
-                  <div class="form-input-hint text-warning">
-                    This URL is already bookmarked. The form has been prefilled
-                    from the existing bookmark, and saving the form will update
-                    the existing bookmark.
-                  </div>
+                  <details class="form-input-hint">
+                    <summary class="text-warning">
+                      Warning! This URL is already bookmarked <i>(Read more)</i>
+                    </summary>
+                    <p>
+                      This URL is already bookmarked. The form has been
+                      prefilled from the existing bookmark, and saving the form
+                      will update the existing bookmark.
+                    </p>
+                  </details>
                 `
               : ''
           }
@@ -443,11 +449,11 @@ class PopupForm extends LitElement {
                         ? html`
                             <button
                               type="button"
-                              class="btn btn-error"
+                              class="btn btn-error btn-wide"
                               aria-label="Delete bookmark"
                               @click="${this.showDeleteConfirmation}"
                             >
-                              ${icons.delete()}
+                              Delete
                             </button>
                           `
                         : nothing
@@ -457,7 +463,7 @@ class PopupForm extends LitElement {
                       class="btn btn-primary btn-wide ml-auto ${this.saveState}"
                       ?disabled="${this.saveState === 'loading'}"
                     >
-                      Save
+                      ${this.existingBookmark ? 'Update' : 'Add'}
                     </button>
                   </div>
                 `

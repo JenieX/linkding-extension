@@ -44,7 +44,7 @@ interface ServerMetadata {
   // Check this
   auto_tags: string[];
 
-  bookmark: ServerBookmark;
+  bookmark: ServerBookmark | null;
 
   metadata: {
     description: string;
