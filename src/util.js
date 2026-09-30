@@ -3,10 +3,25 @@ import { parse as tldtsParse } from '../libs/tldts.js';
 import { getCurrentTabInfo } from './browser.js';
 
 async function createTags() {
+  /** @type {string[]} */
+  const tags = [];
+
   const { url } = await getCurrentTabInfo();
   const { domainWithoutSuffix } = tldtsParse(url);
 
-  return domainWithoutSuffix ?? '';
+  if (domainWithoutSuffix !== null) {
+    tags.push(domainWithoutSuffix);
+  }
+
+  if (url.startsWith('https://marketplace.visualstudio.com')) {
+    tags.push('vscode');
+  }
+
+  if (url.startsWith('https://greasyfork.org')) {
+    tags.push('javascript', 'user-script');
+  }
+
+  return tags.join(' ');
 }
 
 /** @param {HTMLInputElement} input */

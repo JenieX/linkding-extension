@@ -114,6 +114,8 @@ class PopupForm extends LitElement {
   }
 
   async initForm() {
+    this.tags = await createTags();
+
     this.tabInfo = await getCurrentTabInfo();
     this.url = this.tabInfo.url;
 
@@ -156,8 +158,6 @@ class PopupForm extends LitElement {
       this.shared = existingBookmark.shared;
       this.autoTags = '';
     } else {
-      this.tags = await createTags();
-
       // Only show auto tags for new bookmarks
       // Auto tags are only supported since v1.31.0, so we need to check if they are available
       const autoTagsList = serverMetadata.auto_tags;
