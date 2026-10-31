@@ -36,23 +36,25 @@ chrome.omnibox.onInputStarted.addListener(async () => {
   chrome.omnibox.setDefaultSuggestion({ description });
 });
 
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   if (!api) {
     return;
   }
 
-  api
-    .search(text, { limit: 9 })
-    .then((results) => {
-      const bookmarkSuggestions = results.map((bookmark) => ({
-        content: bookmark.url,
-        description: bookmark.title || bookmark.website_title || bookmark.url,
-      }));
-      suggest(bookmarkSuggestions);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  try {
+    const results = await api.search(text, { limit: 9 });
+
+    const bookmarkSuggestions = results.map((bookmark) => ({
+      content: bookmark.url,
+      description: (bookmark.title || bookmark.website_title || bookmark.url)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;'),
+    }));
+
+    suggest(bookmarkSuggestions);
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 chrome.omnibox.onInputEntered.addListener(async (content, disposition) => {
