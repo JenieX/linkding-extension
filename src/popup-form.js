@@ -138,8 +138,13 @@ class PopupForm extends LitElement {
       this.description = asserted(serverMetadata).metadata.description;
     }
 
-    this.shared = asserted(this.configuration?.shareSelected);
-    this.unread = asserted(this.configuration?.unreadSelected);
+    if (
+      this.configuration?.shareSelected &&
+      this.configuration?.unreadSelected
+    ) {
+      this.shared = this.configuration?.shareSelected;
+      this.unread = this.configuration?.unreadSelected;
+    }
 
     if (!serverMetadata) {
       return;
