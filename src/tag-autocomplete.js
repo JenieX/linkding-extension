@@ -51,7 +51,10 @@ class TagAutocomplete extends LitElement {
 
   /** @param {InputEvent} event */
   handleInput(event) {
-    this.value = /** @type {HTMLInputElement} */ (event.target).value;
+    const input = /** @type {HTMLInputElement} */ (event.target);
+
+    this.value = input.value.replaceAll('*', '★');
+    input.value = this.value;
 
     this.fireValueChange();
 
