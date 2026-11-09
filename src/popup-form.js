@@ -73,7 +73,7 @@ class PopupForm extends LitElement {
     this.availableTagNames = [];
 
     this.existingBookmark = null;
-    this.editNotes = false;
+    this.editNotes = true;
     this.profile = null;
     this.tabInfo = null;
     this.extensionConfiguration = null;
