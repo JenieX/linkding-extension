@@ -37,16 +37,14 @@ chrome.omnibox.onInputStarted.addListener(async () => {
   chrome.omnibox.setDefaultSuggestion({ description });
 });
 
-/** @param {string} text */
-async function getTagsSuggestions(text) {
+/**
+ * @param {string[]} previousTags
+ * @param {string} lastTag
+ */
+async function getTagsSuggestions(previousTags, lastTag) {
   const availableTags = await api.getTags();
 
-  const tags = text.split(' ');
-  const previousTags = tags.slice(0, -1);
-  const lastTag = asserted(tags.at(-1));
-
   const inputLastTag = lastTag.slice(1);
-  console.log({ inputLastTag });
 
   /** @type {chrome.omnibox.SuggestResult[]} */
   const tagSuggestions = availableTags
@@ -56,8 +54,6 @@ async function getTagsSuggestions(text) {
       description: tag.name,
     }))
     .slice(0, 9);
-
-  console.log(tagSuggestions);
 
   return tagSuggestions;
 }
@@ -85,10 +81,16 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     return;
   }
 
-  if (!text.includes('#') || text.endsWith(' ')) {
+  const tags = text.split(' ');
+  const previousTags = tags.slice(0, -1);
+  const lastTag = asserted(tags.at(-1));
+
+  // console.log({ text, previousTags, lastTag });
+
+  if (!lastTag.includes('#') || text.endsWith(' ')) {
     suggest(await getBookmarkSuggestions(text));
   } else {
-    suggest(await getTagsSuggestions(text));
+    suggest(await getTagsSuggestions(previousTags, lastTag));
   }
 });
 
